@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Controller\Dto\Base\Validator;
+use App\Controller\Dto\UserCreate;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Password;
@@ -46,22 +48,30 @@ class AuthController
         $this->session->logout();
     }
 
-    public function register_form()
+    public function register_form(): Response
     {
-        return new Response(`
+        return new Response('
             <form action="/register" method="POST">
                 <input type="text" name="username" placeholder="Enter your username">
                 <input type="password" name="password" placeholder="Enter your password">
+                <button>Register</button>
             </form>
-        `);
+        ');
     }
 
-    public function register(string $username, string $password)
+    public function register(UserCreate $dto)
     {
+        $errors = Validator::validate($dto);
+        dd($errors);
+
+        if (0 !== count($errors)) {
+            return new Response(null, Response::HTTP_BAD_REQUEST);
+        }
+
         $user = new User;
 
-        $user->setUsername($username);
-        $user->setPassword((new Password)->hash($password));
+        $user->setUsername($dto->username());
+        $user->setPassword((new Password)->hash($dto->password()));
 
         $this->userRepository->create($user);
     }

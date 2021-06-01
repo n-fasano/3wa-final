@@ -3,6 +3,7 @@
 require_once 'vendor/autoload.php';
 require_once 'config.php';
 
+use App\Controller\Dto\Base\DtoArgumentValueResolver;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,7 +26,13 @@ $dispatcher = new EventDispatcher();
 $dispatcher->addSubscriber(new RouterListener($matcher, new RequestStack()));
 
 $controllerResolver = new ControllerResolver();
-$argumentResolver = new ArgumentResolver();
+$argumentResolver = new ArgumentResolver(
+    null,
+    array_merge(
+        ArgumentResolver::getDefaultArgumentValueResolvers(),
+        [new DtoArgumentValueResolver]
+    )
+);
 
 $kernel = new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
 

@@ -30,6 +30,8 @@ $routes->add('register_form', Route::get('/register', [
 ]));
 
 $routes->add('register', Route::post('/register', [
+    'username' => '',
+    'password' => '',
     '_controller' => [AuthController::class, 'register']
 ]));
 
