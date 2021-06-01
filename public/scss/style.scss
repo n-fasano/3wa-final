@@ -1,0 +1,62 @@
+// As I prefer the bracket syntax, I'm using SCSS and not SASS
+
+$primary: rgba(38, 166, 91, 1);
+
+$headerSize: 5rem;
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+header {
+    background: $primary;
+    height: $headerSize;
+    
+    text-transform: uppercase;
+    font-family: 'Odibee Sans';
+
+    display: flex;
+    justify-content: space-between;
+
+    * {
+        height: $headerSize;
+        line-height: $headerSize;
+        color: white;
+    }
+
+    h1 {
+        font-size: 2rem;
+
+        a {
+            float: left;
+    
+            img {
+                height: $headerSize;
+                padding: 10px;
+            }
+        }
+    }
+
+    nav {
+        margin-right: 40px;
+
+        ul {
+            display: flex;
+
+            li {
+                height: $headerSize;
+                line-height: $headerSize;
+
+                margin: 0 12px;
+
+                a {
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+}
