@@ -7,6 +7,9 @@ use App\Entity\Metadata\Proxy;
 use App\Mysql\Connection;
 use App\Mysql\EntitySerializer;
 use App\Mysql\FieldSerializer;
+use App\Mysql\Query\Where;
+use App\Repository\Search\Criteria;
+use App\Repository\Search\Search;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Repository
@@ -38,16 +41,35 @@ abstract class Repository
     }
 
     /** @return array<Entity> */
-    public function findAll(): array
+    public function findAll(Search $search): array
     {
+        $table = EntitySerializer::serialize($search->class);
+
+        $where = new Where($search);
+        $sqlWhere = $where->query;
+
+        $sql = "SELECT * FROM $table WHERE $sqlWhere";
+        $results = Connection::query($sql, $where->parameters);
         
-        return [];
+        return array_map(
+            fn($row) => $this->hydrate($search->class, $row),
+            $results
+        );
     }
     
-    public function find(): ?Entity
+    public function find(Search $search): ?Entity
     {
+        $table = EntitySerializer::serialize($search->class);
+
+        $where = new Where($search);
+        $sqlWhere = $where->query;
+
+        $sql = "SELECT * FROM $table WHERE $sqlWhere";
+        $results = Connection::query($sql, $where->parameters);
+
+        $row = array_pop($results);
         
-        return new Entity;
+        return null === $row ? null :$this->hydrate($search->class, $row);
     }
     
     public function create(Entity $entity): bool

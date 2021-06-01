@@ -20,9 +20,7 @@ CREATE TABLE `message` (
     `content` VARCHAR(64)
 );
 
-CREATE TABLE `user_message` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE `user_notification` (
     `id_user` INT,
     `id_message` INT,
-    `read` TINYINT DEFAULT 0
 );
