@@ -5,6 +5,8 @@ services:
       context: ./php
     volumes:
       - ..:/var/www/html
+    depends_on: 
+      - mysql
     ports:
       - "9000:9000"
   nginx:
@@ -18,7 +20,5 @@ services:
   mysql:
     build: 
       context: ./mysql
-    environment: 
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
     ports:
       - "3306:3306"

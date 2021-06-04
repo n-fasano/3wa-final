@@ -23,7 +23,7 @@ class AuthController
         $this->userRepository = new UserRepository;
     }
 
-    public function login(Request $request)
+    public function login(Request $request): Response
     {
         if (null === $username = $request->get('') ||
             null === $password = $request->get('password')
@@ -31,7 +31,7 @@ class AuthController
             throw new BadRequestException('You must specify a username and a password');
         }
 
-        $user = (new UserRepository)->findByUsername($username);
+        $user = $this->userRepository->findByUsername($username);
         if (null === $user) {
             throw new BadRequestException('Unknown user or wrong password');
         }
@@ -40,12 +40,16 @@ class AuthController
             throw new BadRequestException('Unknown user or wrong password');
         }
 
+        $this->session->login($user);
 
+        return new Response();
     }
 
-    public function logout(Request $request)
+    public function logout(): Response
     {
         $this->session->logout();
+
+        return new Response();
     }
 
     public function register_form(): Response
@@ -59,13 +63,18 @@ class AuthController
         ');
     }
 
-    public function register(UserCreate $dto)
+    public function register(UserCreate $dto): Response
     {
         $errors = Validator::validate($dto);
-        dd($errors);
 
         if (0 !== count($errors)) {
-            return new Response(null, Response::HTTP_BAD_REQUEST);
+            throw new BadRequestException(array_shift($errors));
+        }
+
+        $username = $dto->username();
+        $user = $this->userRepository->findByUsername($username);
+        if (null !== $user) {
+            throw new BadRequestException("Username $username is already taken.");
         }
 
         $user = new User;
@@ -74,5 +83,8 @@ class AuthController
         $user->setPassword((new Password)->hash($dto->password()));
 
         $this->userRepository->create($user);
+        $this->session->login($user);
+
+        return new Response(null, Response::HTTP_CREATED);
     }
 }

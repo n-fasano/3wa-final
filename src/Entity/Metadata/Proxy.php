@@ -2,37 +2,20 @@
 
 namespace App\Entity\Metadata;
 
-use App\Service\StringCollection;
-use ReflectionClass;
+use App\Entity\Entity;
 
-class Proxy
+class Proxy extends Entity
 {
-    private ReflectionClass $reflection;
-    private StringCollection $fields;
+    public function __construct(private callable $get)
+    { }
 
-    public function __construct(string $entity)
+    public function __get(string $property)
     {
-        $this->reflection = new ReflectionClass($entity);
+        $this->get()->{$property};
     }
 
-    /** @return StringCollection<string> */
-    public function fields(): StringCollection
+    public function __set(string $property, mixed $value)
     {
-        return $this->fields ??= new StringCollection(
-            array_map(
-                fn ($prop) => $prop->getName(), 
-                $this->reflection->getProperties()
-            )
-        );
-    }
-
-    public function getter(string $field): string
-    {
-        return 'get'.ucfirst($field);
-    }
-
-    public function setter(string $field): string
-    {
-        return 'set'.ucfirst($field);
+        $this->get()->{$property} = $value;
     }
 }

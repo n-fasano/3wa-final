@@ -36,9 +36,8 @@ class Where
                     break;
             }
 
-            $this->query .= " AND $sqlField $symbol $token,";
+            $this->query .= " AND $sqlField $symbol $token";
             $this->parameters[$token] = $value;
         }
-        
     }
 }

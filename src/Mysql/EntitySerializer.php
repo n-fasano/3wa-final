@@ -6,14 +6,13 @@ use App\Service\LetterCase;
 
 class EntitySerializer
 {
-    public static function serialize(string $entity): string
+    public static function serialize(string $shortName): string
     {
-        $basename = basename($entity);
-        return LetterCase::pascalToSnake($basename);
+        return LetterCase::pascalToSnake($shortName);
     }
 
-    public static function unserialize(string $entity): string
+    public static function unserialize(string $tableName): string
     {
-        return '\\App\\Entity\\'.LetterCase::snakeToPascal($entity);
+        return '\\App\\Entity\\'.LetterCase::snakeToPascal($tableName);
     }
 }

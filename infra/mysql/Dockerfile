@@ -1,6 +1,6 @@
 FROM mysql:8.0.25
 
-ADD ./install.sql /tmp/install.sql
-ADD ./install.sh /tmp/install.sh
+ENV MYSQL_DATABASE "3wa_final"
+ENV MYSQL_ROOT_PASSWORD "root"
 
-# RUN /tmp/install.sh
+COPY ./install.sql /docker-entrypoint-initdb.d/install.sql

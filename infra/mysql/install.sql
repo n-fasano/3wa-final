@@ -1,3 +1,5 @@
+USE 3wa_final;
+
 CREATE TABLE `user` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `username` VARCHAR(64),
@@ -5,7 +7,7 @@ CREATE TABLE `user` (
 );
 
 CREATE TABLE `thread` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `id` INT PRIMARY KEY AUTO_INCREMENT
 );
 
 CREATE TABLE `thread_user` (
@@ -20,7 +22,7 @@ CREATE TABLE `message` (
     `content` VARCHAR(64)
 );
 
-CREATE TABLE `user_notification` (
+CREATE TABLE `notification` (
     `id_user` INT,
-    `id_message` INT,
+    `id_message` INT
 );

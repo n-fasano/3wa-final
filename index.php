@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -38,8 +39,15 @@ $kernel = new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $
 
 try {
     $response = $kernel->handle($request);
+} catch (BadRequestHttpException $exception) {
+    $response = new Response($exception->getMessage(), 400);
 } catch (NotFoundHttpException|MethodNotAllowedHttpException $exception) {
     $response = new Response(null, 404);
+} catch (Exception $exception) {
+    $response = new Response(
+        "Something is wrong. If this persists, please contact the site's administrator: fasano.nm@gmail.com", 
+        500
+    );
 }
 
 $response->send();

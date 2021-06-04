@@ -6,9 +6,9 @@ class LetterCase
 {
     public static function camelToSnake(string $camel): string
     {
-        $snake = '';
+        $snake = $camel[0] ?? '';
 
-        for ($i = 0; $i < strlen($camel); $i++) {
+        for ($i = 1; $i < strlen($camel); $i++) {
             $letter = $camel[$i];
 
             $code = ord($letter);

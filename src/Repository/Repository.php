@@ -4,23 +4,26 @@ namespace App\Repository;
 
 use App\Entity\Entity;
 use App\Entity\Metadata\Proxy;
+use App\Entity\Metadata\Reader;
 use App\Mysql\Connection;
 use App\Mysql\EntitySerializer;
 use App\Mysql\FieldSerializer;
+use App\Mysql\Query\Select;
 use App\Mysql\Query\Where;
 use App\Repository\Search\Criteria;
 use App\Repository\Search\Search;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use ReflectionProperty;
 
 abstract class Repository
 {
     /** @return array<Entity> */
     public function getAll(string $class): array
     {
-        $table = EntitySerializer::serialize($class);
+        $reader = new Reader($class);
+        $table = EntitySerializer::serialize($reader->shortName());
+        $select = new Select($table);
 
-        $sql = "SELECT * FROM $table";
-        $results = Connection::query($sql);
+        $results = Connection::query($select);
         
         return array_map(
             fn($row) => $this->hydrate($class, $row),
@@ -30,26 +33,57 @@ abstract class Repository
 
     public function get(string $class, int $id): ?Entity
     {
-        $table = EntitySerializer::serialize($class);
+        $reader = new Reader($class);
+        $table = EntitySerializer::serialize($reader->shortName());
+        $select = new Select(
+            $table,
+            new Where(new Search(
+                $class,
+                [new Criteria(
+                    'id', 
+                    $id
+                )]
+            ))
+        );
 
-        $sql = "SELECT * FROM $table WHERE id = :id";
-        $results = Connection::query($sql, [':id' => $id]);
-
+        $results = Connection::query($select);
         $row = array_pop($results);
         
-        return null === $row ? null :$this->hydrate($class, $row);
+        return null === $row ? null : $this->hydrate($class, $row);
+    }
+
+    public function exists(string $class, int $id): bool
+    {
+        $reader = new Reader($class);
+        $table = EntitySerializer::serialize($reader->shortName());
+        $select = new Select(
+            $table,
+            new Where(new Search(
+                $class,
+                [new Criteria(
+                    'id', 
+                    $id
+                )]
+            ))
+        );
+
+        $results = Connection::query($select);
+        $row = array_pop($results);
+        
+        return null !== $row;
     }
 
     /** @return array<Entity> */
     public function findAll(Search $search): array
     {
-        $table = EntitySerializer::serialize($search->class);
+        $reader = new Reader($search->class);
+        $table = EntitySerializer::serialize($reader->shortName());
+        $select = new Select(
+            $table,
+            new Where($search)
+        );
 
-        $where = new Where($search);
-        $sqlWhere = $where->query;
-
-        $sql = "SELECT * FROM $table WHERE $sqlWhere";
-        $results = Connection::query($sql, $where->parameters);
+        $results = Connection::query($select);
         
         return array_map(
             fn($row) => $this->hydrate($search->class, $row),
@@ -59,39 +93,43 @@ abstract class Repository
     
     public function find(Search $search): ?Entity
     {
-        $table = EntitySerializer::serialize($search->class);
+        $reader = new Reader($search->class);
+        $table = EntitySerializer::serialize($reader->shortName());
+        $select = new Select(
+            $table,
+            new Where($search)
+        );
 
-        $where = new Where($search);
-        $sqlWhere = $where->query;
-
-        $sql = "SELECT * FROM $table WHERE $sqlWhere";
-        $results = Connection::query($sql, $where->parameters);
-
+        $results = Connection::query($select);
         $row = array_pop($results);
         
-        return null === $row ? null :$this->hydrate($search->class, $row);
+        return null === $row ? null : $this->hydrate($search->class, $row);
     }
     
-    public function create(Entity $entity): bool
+    public function create(Entity $entity, ...$parameters): bool
     {
         $class = get_class($entity);
-        $table = EntitySerializer::serialize($class);
+        $reader = new Reader($class);
+        $table = EntitySerializer::serialize($reader->shortName());
 
         $sqlFields = '';
         $sqlValues = '';
         $sqlParameters = [];
         
-        $proxy = new Proxy(get_class($entity));
-        foreach ($proxy->fields()->not('id') as $field) {
-            $getter = $proxy->getter($field);
-            if (null !== $fieldValue = $entity->{$getter}()) {
+        $fields = $reader->fields()->not('id');
+        foreach ($fields as $field) {
+            if (null !== $fieldValue = $entity->{$field}) {
                 $sqlField = FieldSerializer::serialize($field);
                 $sqlFields .= "$sqlField,";
 
-                $token = ":$sqlField";
-                $sqlValues .= "$sqlField = $token,";
+                if (is_a($fieldValue, Entity::class)) {
+                    $fieldValue = $fieldValue->getId();
+                }
 
-                $sqlParameters[$sqlField] = $fieldValue;
+                $token = ":$sqlField";
+                $sqlValues .= "$token,";
+
+                $sqlParameters[$token] = $fieldValue;
             }
         }
 
@@ -105,17 +143,20 @@ abstract class Repository
     public function update(Entity $entity): bool
     {
         $class = get_class($entity);
-        $table = EntitySerializer::serialize($class);
+        $reader = new Reader($class);
+        $table = EntitySerializer::serialize($reader->shortName());
 
         $sqlAssignments = '';
         $sqlParameters = [];
         
-        $proxy = new Proxy($class);
-        foreach ($proxy->fields()->not('id') as $field) {
-            $getter = $proxy->getter($field);
-            if (null !== $fieldValue = $entity->{$getter}()) {
+        foreach ($reader->fields()->not('id') as $field) {
+            if (null !== $fieldValue = $entity->{$field}) {
                 $sqlField = FieldSerializer::serialize($field);
                 $token = ":$sqlField";
+
+                if (is_a($fieldValue, Entity::class)) {
+                    $fieldValue = $fieldValue->getId();
+                }
 
                 $sqlAssignments .= "$sqlField = $token,";
                 $sqlParameters[$token] = $fieldValue;
@@ -123,7 +164,7 @@ abstract class Repository
         }
 
         $sqlAssignments = rtrim($sqlAssignments, ',');
-        $sqlParameters[':id'] = $entity->getId();
+        $sqlParameters[':id'] = $entity->id;
 
         $sql = "UPDATE $table SET $sqlAssignments WHERE id = :id";
         return Connection::command($sql, $sqlParameters);
@@ -135,18 +176,36 @@ abstract class Repository
         $table = EntitySerializer::serialize($class);
 
         $sql = "DELETE FROM $table WHERE id = :id";
-        return Connection::command($sql, [':id' => $entity->getId()]);
+        return Connection::command($sql, [':id' => $entity->id]);
     }
 
-    public function hydrate(string $class, string $row)
+    public function hydrate(string $class, array $row)
     {
-        $proxy = new Proxy($class);
+        $reader = new Reader($class);
         $entity = new $class;
 
-        foreach ($proxy->fields() as $field) {
-            $setter = $proxy->setter($field);
+        /** @var ReflectionProperty $property */
+        foreach ($reader->properties() as $property) {
+            $field = $property->getName();
+            $type = $property->getType();
+
             $sqlField = FieldSerializer::serialize($field);
-            $entity->{$setter}($row[$sqlField]);
+            $value = $row[$sqlField];
+
+            if (is_a($type, Entity::class)) {
+                $repository = $this;
+                $value = new Proxy(function () use ($repository, $type, $value) {
+                    static $instance;
+                    if (!isset($instance)) {
+                        $instance = $repository->get($type, $value);
+                    }
+                    return $instance;
+                });
+            }
+
+            $entity->{$field} = $value;
         }
+
+        return $entity;
     }
 }
