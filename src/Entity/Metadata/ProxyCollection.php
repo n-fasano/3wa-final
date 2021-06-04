@@ -2,12 +2,13 @@
 
 namespace App\Entity\Metadata;
 
-use App\Entity\Entity;
+use App\Service\Collection;
 
-class Proxy extends Entity
+class ProxyCollection extends Collection
 {
-    public function __construct(private callable $get)
-    { }
+    public function __construct(
+        private callable $get
+    ) { }
 
     public function __get(string $property)
     {

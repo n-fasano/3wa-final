@@ -24,5 +24,6 @@ CREATE TABLE `message` (
 
 CREATE TABLE `notification` (
     `id_user` INT,
-    `id_message` INT
+    `id_thread` INT,
+    `count` INT
 );

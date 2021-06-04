@@ -11,6 +11,11 @@ class FieldSerializer
         return LetterCase::camelToSnake($field);
     }
 
+    public static function serializeId(string $entity): string
+    {
+        return 'id_' . EntitySerializer::serialize($entity);
+    }
+
     public static function unserialize(string $field): string
     {
         return LetterCase::snakeToCamel($field);

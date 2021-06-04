@@ -3,7 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Entity;
+use App\Entity\Metadata\ArrayProxy;
+use App\Entity\Metadata\OneToMany;
 use App\Entity\Metadata\Proxy;
+use App\Entity\Metadata\ProxyBuilder;
+use App\Entity\Metadata\ProxyCollection;
 use App\Entity\Metadata\Reader;
 use App\Mysql\Connection;
 use App\Mysql\EntitySerializer;
@@ -193,19 +197,55 @@ abstract class Repository
             $value = $row[$sqlField];
 
             if (is_a($type, Entity::class)) {
-                $repository = $this;
-                $value = new Proxy(function () use ($repository, $type, $value) {
-                    static $instance;
-                    if (!isset($instance)) {
-                        $instance = $repository->get($type, $value);
-                    }
-                    return $instance;
-                });
+                $value = $this->getProxy($type, $value);
+            }
+            else if ('iterable' === $type) {
+                $value = $this->getProxyCollection($property, $reader->shortName(), $row['id']);
             }
 
             $entity->{$field} = $value;
         }
 
         return $entity;
+    }
+
+    protected function getProxy(string $type, int $id)
+    {
+        $repository = $this;
+        $proxy = ProxyBuilder::getProxy($type);
+        return new $proxy(function () use ($repository, $type, $id) {
+            static $instance;
+            if (!isset($instance)) {
+                $instance = $repository->get($type, $id);
+            }
+            return $instance;
+        });
+    }
+
+    protected function getProxyCollection(ReflectionProperty $property, string $parentClass, int $parentId)
+    {
+        $attribute = $property->getAttributes(OneToMany::class)[0];
+        $oneToMany = $attribute->newInstance();
+        $childClass = $oneToMany->class;
+
+        $table = 
+            EntitySerializer::serialize($parentClass) . '_' . 
+            EntitySerializer::serialize($childClass);
+
+        return new ProxyCollection(function () use ($table, $parentClass, $childClass, $parentId) {
+            return Connection::query(
+                new Select(
+                    $table,
+                    new Where(
+                        new Search(
+                            $childClass,
+                            [new Criteria(
+                                FieldSerializer::serializeId($parentClass), $parentId
+                            )]
+                        )
+                    )
+                )
+            );
+        }, $parentClass, $oneToMany->class, $parentId);
     }
 }

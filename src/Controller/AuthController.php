@@ -36,7 +36,7 @@ class AuthController
             throw new BadRequestException('Unknown user or wrong password');
         }
 
-        if (!(new Password)->verify($password, $user->getPassword())) {
+        if (!(new Password)->verify($password, $user->password)) {
             throw new BadRequestException('Unknown user or wrong password');
         }
 
@@ -79,8 +79,8 @@ class AuthController
 
         $user = new User;
 
-        $user->setUsername($dto->username());
-        $user->setPassword((new Password)->hash($dto->password()));
+        $user->username = $dto->username();
+        $user->password = (new Password)->hash($dto->password());
 
         $this->userRepository->create($user);
         $this->session->login($user);

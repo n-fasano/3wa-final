@@ -1,6 +1,7 @@
 <?php
 
 const ROOT = __DIR__;
+const CACHE_DIR = __DIR__ . '/cache';
 
 const MYSQL_HOST = 'mysql';
 const MYSQL_PORT = '3306';

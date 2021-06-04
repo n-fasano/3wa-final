@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Entity\Metadata\OneToMany;
+use App\Entity\Metadata\ManyToMany;
 
 class Thread extends Entity
 {
-    #[OneToMany(User::class)]
-    public array $users;
+    #[ManyToMany(User::class)]
+    public iterable $users;
 }
