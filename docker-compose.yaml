@@ -2,23 +2,24 @@ version: "3.3"
 services:
   php:
     build: 
-      context: ./php
+      context: ./infra/php
     volumes:
-      - ..:/var/www/html
+      - ./back:/var/www/html
     depends_on: 
       - mysql
     ports:
       - "9000:9000"
   nginx:
     build: 
-      context: ./nginx
+      context: ./infra/nginx
     volumes:
-      - ..:/var/www/html
+      - ./front/public:/var/www/html
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
       - "443:443"
   mysql:
     build: 
-      context: ./mysql
+      context: ./infra/mysql
     ports:
       - "3306:3306"

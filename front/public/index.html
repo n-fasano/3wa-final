@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Linking the Odibee Sans font -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Odibee+Sans&display=swap" rel="stylesheet">
+
+    <!-- CSS reset + style -->
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/js/elements/Router.js"></script>
+</head>
+<body>
+    <header>
+        <h1>
+            <app-link title="Home" href="/"><img src="/img/emerald.png" alt="Emerald Messenger's logo"></app-link>
+            Emerald Messenger
+        </h1>
+
+        <nav>
+            <ul>
+                <li>
+                    <app-link title="Login to EM" href="/login">Login</app-link>
+                </li>
+                <li>
+                    <app-link title="Register to EM"  href="/register">Register</app-link>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <app-router>
+            <app-route path="/">Home</app-route>
+            <app-route path="/register">Register</app-route>
+            <app-route path="/login">Login</app-route>
+            <app-route path="/logout">Logout</app-route>
+            <app-route path="/threads">List</app-route>
+            <app-route path="/thread/{id}">Chat</app-route>
+        </app-router>
+    </main>
+</body>
+</html>

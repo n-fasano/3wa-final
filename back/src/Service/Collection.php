@@ -3,9 +3,8 @@
 namespace App\Service;
 
 use Iterator;
-use ArrayAccess;
 
-class Collection implements Iterator, ArrayAccess
+class Collection implements Iterator
 {
     protected $position = 0;
     protected array $items;
@@ -38,30 +37,5 @@ class Collection implements Iterator, ArrayAccess
     public function valid(): bool
     {
         return isset($this->items[$this->position]);
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        if (is_null($offset))
-        {
-            $this->container[] = $value;
-        } else {
-            $this->container[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset): bool
-    {
-        return isset($this->container[$offset]);
-    }
-
-    public function offsetUnset($offset)
-    {
-        unset($this->container[$offset]);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->container[$offset] ?? null;
     }
 }

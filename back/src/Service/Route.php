@@ -8,6 +8,7 @@ class Route
 {
     public static function get(
         string $path, 
+        array $controller,
         array $defaults = [], 
         array $requirements = [], 
         array $options = [], 
@@ -15,6 +16,8 @@ class Route
         $schemes = [], 
         ?string $condition = ''
     ): RoutingRoute {
+        $defaults['_controller'] = $controller;
+
         return new RoutingRoute(
             $path, 
             $defaults, 
@@ -29,6 +32,7 @@ class Route
 
     public static function post(
         string $path, 
+        array $controller,
         array $defaults = [], 
         array $requirements = [], 
         array $options = [], 
@@ -36,6 +40,8 @@ class Route
         $schemes = [], 
         ?string $condition = ''
     ): RoutingRoute {
+        $defaults['_controller'] = $controller;
+
         return new RoutingRoute(
             $path, 
             $defaults, 

@@ -35,4 +35,11 @@ class ThreadController
 
         return new Response("You requested user $username !");
     }
+    
+    public function show(Request $request)
+    {
+        $id = $request->get('id');
+
+        return new Response("You requested thread #$id !");
+    }
 }

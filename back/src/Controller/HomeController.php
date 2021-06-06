@@ -15,12 +15,12 @@ class HomeController
         $this->session = new Session;
     }
     
-    public function home()
+    public function welcome()
     {
         // if (false === $this->session->isLogged()) {
         //     return new RedirectResponse('/login');
         // }
 
-        return new Response(file_get_contents(ROOT.'/public/index.html'));
+        return new Response('Welcome to the API !');
     }
 }
