@@ -2,31 +2,35 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 62.5%;
+}
+
 a {
   text-decoration: none;
 }
 
 header {
   background: #26a65b;
-  height: 5rem;
+  height: calc(1rem + 7vmin);
   text-transform: uppercase;
   font-family: "Odibee Sans";
   display: flex;
   justify-content: space-between;
 }
 header * {
-  height: 5rem;
-  line-height: 5rem;
+  height: calc(1rem + 7vmin);
+  line-height: calc(1rem + 7vmin);
   color: white;
 }
 header h1 {
-  font-size: 2rem;
+  font-size: calc(1rem + 2vmin);
 }
 header h1 a {
   float: left;
 }
 header h1 a img {
-  height: 5rem;
+  height: calc(1rem + 7vmin);
   padding: 10px;
 }
 header nav {
@@ -36,12 +40,17 @@ header nav ul {
   display: flex;
 }
 header nav ul li {
-  height: 5rem;
-  line-height: 5rem;
+  height: calc(1rem + 7vmin);
+  line-height: calc(1rem + 7vmin);
   margin: 0 12px;
 }
 header nav ul li a {
-  font-size: 1.2rem;
+  font-size: calc(1rem + 1.2vmin);
+}
+
+main {
+  width: 70vw;
+  margin: calc(1rem + 7vmin) auto;
 }
 
 /*# sourceMappingURL=style.css.map */

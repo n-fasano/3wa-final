@@ -1,37 +1,19 @@
 <?php
 
+use App\Controller\AuthController;
 use App\Controller\HomeController;
 use App\Controller\ThreadController;
 use App\Service\Route;
-use Symfony\Component\Routing\RouteCollection;
+use App\Service\RouteCollectionBuilder;
 
-$routes = new RouteCollection();
+$routes = new RouteCollectionBuilder('/api');
 
-$routes->add('welcome', Route::get('/api', [HomeController::class, 'welcome']));
+$routes->add('welcome', Route::get('', [HomeController::class, 'welcome']));
 
-$routes->add('show_thread', Route::get('/api/thread/{id}', [ThreadController::class, 'show']));
+$routes->add('show_thread', Route::get('/thread/{id}', [ThreadController::class, 'show']));
 
-// $routes->add('view_user', Route::get('/users/{username}', [
-//     'username' => null,
-//     '_controller' => [UserController::class, 'view']
-// ]));
+$routes->add('login', Route::post('/login', [AuthController::class, 'login']));
+$routes->add('logout', Route::post('/logout', [AuthController::class, 'logout']));
+$routes->add('register', Route::post('/register', [AuthController::class, 'register']));
 
-// $routes->add('login', Route::post('/login', [
-//     '_controller' => [AuthController::class, 'login']
-// ]));
-
-// $routes->add('logout', Route::post('/logout', [
-//     '_controller' => [AuthController::class, 'logout']
-// ]));
-
-// $routes->add('register_form', Route::get('/register', [
-//     '_controller' => [AuthController::class, 'register_form']
-// ]));
-
-// $routes->add('register', Route::post('/register', [
-//     'username' => '',
-//     'password' => '',
-//     '_controller' => [AuthController::class, 'register']
-// ]));
-
-return $routes;
+return $routes->build();

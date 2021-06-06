@@ -2,10 +2,14 @@
 
 $primary: rgba(38, 166, 91, 1);
 
-$headerSize: 5rem;
+$headerSize: calc(1rem + 7vmin);
 
 * {
     box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
 }
 
 a {
@@ -29,7 +33,7 @@ header {
     }
 
     h1 {
-        font-size: 2rem;
+        font-size: calc(1rem + 2vmin);
 
         a {
             float: left;
@@ -54,9 +58,14 @@ header {
                 margin: 0 12px;
 
                 a {
-                    font-size: 1.2rem;
+                    font-size: calc(1rem + 1.2vmin);
                 }
             }
         }
     }
+}
+
+main {
+    width: 70vw;
+    margin: $headerSize auto;
 }

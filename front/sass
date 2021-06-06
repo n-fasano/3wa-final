@@ -1,3 +1,6 @@
 #! /bin/sh
 
-./node_modules/.bin/sass --watch public/scss/style.scss public/css/style.css
+OPTS=""
+[ "watch" = "$1" ] && OPTS="$OPTS --watch"
+
+./node_modules/.bin/sass $OPTS public/scss/style.scss public/css/style.css

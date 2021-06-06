@@ -1,14 +1,15 @@
 class Route extends HTMLElement {
     constructor() {
         super();
-    
-        // this.attachShadow({ mode: 'open' });
-        // this.shadowRoot.append(style, wrapper);
+    }
 
-        console.log(this.innerHTML);
-        window.onpopstate = function (event) {
-            console.log(event);
-        }
+    connectedCallback() {
+        this.path = this.getAttribute('path');
+        this.public = this.hasAttribute('public');
+        this.redirect = this.getAttribute('redirect');
+        this.component = this.getAttribute('component');
+
+        Router.routes[this.path] = this;
     }
 }
 
