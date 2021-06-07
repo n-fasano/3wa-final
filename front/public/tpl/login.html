@@ -1,5 +1,26 @@
-<form is="app-form" action="/login" method="POST" redirect="/">
-    <input type="text" name="username" placeholder="Enter your username">
-    <input type="password" name="password" placeholder="Enter your password">
-    <button>Login</button>
+<form is="app-form" action="/login" method="POST" redirect="/" onSuccess="onLoginSuccess">
+    <p>
+        <input 
+            type="text" 
+            name="username" 
+            required
+            minlength="4" 
+            maxlength="32" 
+            placeholder="Enter your username"
+        >
+    </p>
+    <p>
+        <input 
+            type="password" 
+            name="password" 
+            required
+            minlength="8" 
+            maxlength="255" 
+            placeholder="Enter your password"
+        >
+    </p>
+    <p>
+        <button>Login</button>
+    </p>
 </form>
+<script src="/js/pages/login.js"></script>

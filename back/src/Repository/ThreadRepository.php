@@ -6,10 +6,8 @@ use App\Entity\Entity;
 
 class ThreadRepository extends Repository
 {
-    public function create(Entity $thread, ...$parameters): bool 
+    public function create(Entity $thread): bool 
     {
-        $usersIds = $parameters['usersIds'] ?? [];
-        
 
         
         return false;

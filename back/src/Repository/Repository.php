@@ -110,7 +110,7 @@ abstract class Repository
         return null === $row ? null : $this->hydrate($search->class, $row);
     }
     
-    public function create(Entity $entity, ...$parameters): bool
+    public function create(Entity $entity): bool
     {
         $class = get_class($entity);
         $reader = new Reader($class);
@@ -141,7 +141,12 @@ abstract class Repository
         $sqlValues = rtrim($sqlValues, ',');
 
         $sql = "INSERT INTO $table ($sqlFields) VALUES ($sqlValues)";
-        return Connection::command($sql, $sqlParameters);
+
+        if (true === $success = Connection::command($sql, $sqlParameters)) {
+            $entity->id = Connection::lastInsertId();
+        }
+        
+        return $success;
     }
     
     public function update(Entity $entity): bool

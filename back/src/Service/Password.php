@@ -11,6 +11,6 @@ class Password
 
     public function verify(string $password, string $hash)
     {
-        return $this->hash($password) === $hash;
+        return password_verify($password, $hash);
     }
 }

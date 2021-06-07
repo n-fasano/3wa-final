@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/style.css">
 
+    <script src="/js/utility/ScriptLinker.js"></script>
+    <script src="/js/utility/User.js"></script>
+
     <script src="/js/elements/Router.js"></script>
     <script src="/js/elements/Route.js"></script>
     <script src="/js/elements/Link.js"></script>
@@ -34,6 +37,9 @@
                 <li>
                     <a is="app-link" title="Register to EM"  href="/register">Register</a>
                 </li>
+                <li>
+                    <a is="app-link" title="Logout of EM" href="/logout">Logout</a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -45,7 +51,7 @@
             <app-route path="/register"     component="register"    public  ></app-route>
             <app-route path="/login"        component="login"       public  ></app-route>
             <app-route path="/logout"       component="logout"              ></app-route>
-            <app-route path="/threads"      component="thread_list"         ></app-route>
+            <app-route path="/threads"      component="threads"             ></app-route>
             <app-route path="/thread/{id}"  component="thread"              ></app-route>
 
             <app-route path="/404"          component="404"         public  ></app-route>

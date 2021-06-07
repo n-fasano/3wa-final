@@ -4,24 +4,33 @@ class Form extends HTMLFormElement {
 
         this.addEventListener('submit', function (e) {
             e.preventDefault();
-            
-            this.checkValidity();
+            if (!this.checkValidity()) {
+                return;
+            }
 
-            console.log(`/api${this.actionPath}`);
+            const self = this;
 
             fetch(`/api${this.actionPath}`, {
                 method: 'POST',
                 body: new FormData(this)
             })
                 .then(function(response) {
-                    console.log(response);
                     return response.json();
                 })
                 .then(function (json) {
-                    console.log('ici: ' + json);
+                    if (json.error) {
+                        console.log('err: ' + json.error);
+                    } else {
+                        (self.onSuccess)(json);
+
+                        history.pushState({
+                            path: window.location.pathname
+                        }, self.id, self.redirect);
+                    }
                 })
                 .catch(function (error) {
-                    console.log('là: ' + error);
+                    (self.onError)(error);
+                    console.log('err: ' + error);
                 });
         });
     }
@@ -29,6 +38,10 @@ class Form extends HTMLFormElement {
     connectedCallback() {
         this.actionPath = this.action.replace(location.origin, '');
         this.redirect = this.getAttribute('redirect');
+
+        const defaultCallback = () => null;
+        this.onSuccess = this.getAttribute('onSuccess') ?? defaultCallback;
+        this.onError = this.getAttribute('onError') ?? defaultCallback;
     }
 }
 

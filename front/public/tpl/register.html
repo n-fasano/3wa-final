@@ -1,6 +1,43 @@
-<form is="app-form" action="/register" method="POST" redirect="/login">
-    <input type="text" name="username" placeholder="Enter your username">
-    <input type="password" name="password" placeholder="Enter your password">
-    <input type="password" name="_password" placeholder="Confirm your password">
-    <button>Register</button>
+<form is="app-form" action="/register" method="POST" redirect="/login" id="register">
+    <p>
+        <input 
+            type="text" 
+            name="username" 
+            required
+            minlength="4" 
+            maxlength="32" 
+            placeholder="Enter your username"
+        >
+    </p>
+    <p>
+        <input 
+            type="password" 
+            name="password" 
+            required
+            minlength="8" 
+            maxlength="255" 
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,255}$"
+            placeholder="Enter your password"
+        >
+        <!-- Pattern found here: https://stackoverflow.com/a/27976676 -->
+    </p>
+    <ul>
+        <li>At least 8 characters</li>
+        <li>At least 1 uppercase</li>
+        <li>At least 1 lowercase</li>
+        <li>At least 1 number</li>
+        <li>At least 1 symbol (!@#$%^&*_=+-)</li>
+    </ul>
+    <p>
+        <input 
+            type="password" 
+            name="confirm" 
+            required
+            placeholder="Confirm your password"
+        >
+    </p>
+    <p>
+        <button>Register</button>
+    </p>
 </form>
+<script src="/js/pages/register.js"></script>

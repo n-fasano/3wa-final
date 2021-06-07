@@ -9,6 +9,7 @@ use App\Repository\UserRepository;
 use App\Service\Password;
 use App\Service\Session;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,10 +24,18 @@ class AuthController
         $this->userRepository = new UserRepository;
     }
 
-    public function login(Request $request): Response
+    public function logged(): JsonResponse
     {
-        if (null === $username = $request->get('') ||
-            null === $password = $request->get('password')
+        return new JsonResponse(
+            ['logged' => $this->session->isLogged()], 
+            Response::HTTP_OK
+        );
+    }
+
+    public function login(Request $request): JsonResponse
+    {
+        if (null === ($username = $request->get('username')) ||
+            null === ($password = $request->get('password'))
         ) {
             throw new BadRequestException('You must specify a username and a password');
         }
@@ -40,30 +49,21 @@ class AuthController
             throw new BadRequestException('Unknown user or wrong password');
         }
 
-        $this->session->login($user);
+        $success = $this->session->login($user);
+        $code = $success ? Response::HTTP_OK : Response::HTTP_INTERNAL_SERVER_ERROR;
 
-        return new Response();
+        return new JsonResponse(['id' => $user->id], $code);
     }
 
-    public function logout(): Response
+    public function logout(): JsonResponse
     {
-        $this->session->logout();
+        $success = $this->session->logout();
+        $code = $success ? Response::HTTP_OK : Response::HTTP_INTERNAL_SERVER_ERROR;
 
-        return new Response();
+        return new JsonResponse([], $code);
     }
 
-    public function register_form(): Response
-    {
-        return new Response('
-            <form action="/register" method="POST">
-                <input type="text" name="username" placeholder="Enter your username">
-                <input type="password" name="password" placeholder="Enter your password">
-                <button>Register</button>
-            </form>
-        ');
-    }
-
-    public function register(UserCreate $dto): Response
+    public function register(UserCreate $dto): JsonResponse
     {
         $errors = Validator::validate($dto);
 
@@ -82,9 +82,9 @@ class AuthController
         $user->username = $dto->username();
         $user->password = (new Password)->hash($dto->password());
 
-        $this->userRepository->create($user);
-        $this->session->login($user);
+        $success = $this->userRepository->create($user);
+        $code = $success ? Response::HTTP_CREATED : Response::HTTP_INTERNAL_SERVER_ERROR;
 
-        return new Response(null, Response::HTTP_CREATED);
+        return new JsonResponse(['id' => $user->id], $code);
     }
 }

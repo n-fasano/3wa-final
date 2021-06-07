@@ -18,14 +18,16 @@ class Session
         return $_SESSION['username'] ?? null;
     }
 
-    public function login(User $user)
+    public function login(User $user): bool
     {
         $_SESSION['logged'] = true;
-        $_SESSION['username'] = $user->getUsername();
+        $_SESSION['username'] = $user->username;
+
+        return true;
     }
 
-    public function logout()
+    public function logout(): bool
     {
-        session_destroy();
+        return session_destroy();
     }
 }

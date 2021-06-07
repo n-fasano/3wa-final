@@ -35,4 +35,9 @@ class Connection
         $statement = self::getInstance()->prepare($sql);
         return $statement->execute($parameters);
     }
+
+    public static function lastInsertId(): int
+    {
+        return (int) self::$instance->lastInsertId();
+    }
 }

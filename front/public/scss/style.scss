@@ -68,4 +68,20 @@ header {
 main {
     width: 70vw;
     margin: $headerSize auto;
+
+    form {
+        
+        > * {
+            margin: 10px auto;
+            width: fit-content;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: disc;
+        }
+    }
 }

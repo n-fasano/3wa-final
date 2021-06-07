@@ -40,7 +40,7 @@ $kernel = new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $
 try {
     $response = $kernel->handle($request);
 } catch (BadRequestHttpException $exception) {
-    $response = new Response($exception->getMessage(), 400);
+    $response = new Response(json_encode(['error' => $exception->getMessage()]), 400);
 } catch (NotFoundHttpException|MethodNotAllowedHttpException $exception) {
     $response = new Response(null, 404);
 } catch (Exception $exception) {

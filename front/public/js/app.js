@@ -1,7 +1,18 @@
 $_ = document.querySelectorAll;
 
-var user = {
-    logged: false
-};
+async function app() {
+    if (false === User.logged) {
+        User.logged = await User.isLogged();
 
-Router.initialize();
+        if (true === User.logged) {
+            history.replaceState({
+                path: window.location.pathname
+            }, document.title, '/');
+        }
+    } else {
+        Router.initialize();
+    }
+    
+}
+
+app();

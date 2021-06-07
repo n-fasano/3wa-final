@@ -21,6 +21,7 @@ class Router extends HTMLElement {
     constructor() {
         super();
     
+        window.addEventListener('replacestate', this.handleNavigation);
         window.addEventListener('pushstate', this.handleNavigation);
         window.addEventListener('popstate', this.handleNavigation);
 
@@ -39,12 +40,17 @@ class Router extends HTMLElement {
             route = Router.routes[route.redirect];
         }
 
-        if (!route.public && !user.logged) {
+        if (!route.public && !User.logged) {
             route = Router.routes['/login'];
         }
 
         const html = await Router.getHtml(route.component);
         Router.self.innerHTML = html;
+
+        const scripts = Router.self.querySelectorAll('script');
+        scripts.forEach(function (script) {
+            ScriptLinker.replaceScriptNode(script);
+        });
     }
 
     static initialize() {

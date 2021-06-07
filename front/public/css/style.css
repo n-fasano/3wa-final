@@ -52,5 +52,15 @@ main {
   width: 70vw;
   margin: calc(1rem + 7vmin) auto;
 }
+main form > * {
+  margin: 10px auto;
+  width: fit-content;
+}
+main form p {
+  text-align: center;
+}
+main form ul {
+  list-style-type: disc;
+}
 
 /*# sourceMappingURL=style.css.map */
