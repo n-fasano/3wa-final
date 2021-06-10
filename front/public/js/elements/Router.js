@@ -44,7 +44,7 @@ class Router extends HTMLElement {
             route = Router.routes['/login'];
         }
 
-        const html = await Router.getHtml(route.component);
+        const html = await Router.getTemplate(route.component);
         Router.self.innerHTML = html;
 
         const scripts = Router.self.querySelectorAll('script');
@@ -57,7 +57,7 @@ class Router extends HTMLElement {
         Router.self.handleNavigation(null);
     }
 
-    static async getHtml(component) {
+    static async getTemplate(component) {
         if (undefined === Router.components[component]) {
             Router.components[component] = await fetch(`/tpl/${component}.html`)
                 .then(function (response) {

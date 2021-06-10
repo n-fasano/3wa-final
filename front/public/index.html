@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/style.css">
 
+    <script src="/js/Component/$element.js"></script>
+    <script src="/js/Component/Component.js"></script>
+
     <script src="/js/utility/ScriptLinker.js"></script>
     <script src="/js/utility/User.js"></script>
 
@@ -23,26 +26,7 @@
     <script src="/js/elements/Form.js"></script>
 </head>
 <body>
-    <header>
-        <h1>
-            <a is="app-link" title="Home" href="/"><img src="/img/emerald.png" alt="Emerald Messenger's logo"></a>
-            Emerald Messenger
-        </h1>
-
-        <nav>
-            <ul>
-                <li>
-                    <a is="app-link" title="Login to EM" href="/login">Login</a>
-                </li>
-                <li>
-                    <a is="app-link" title="Register to EM"  href="/register">Register</a>
-                </li>
-                <li>
-                    <a is="app-link" title="Logout of EM" href="/logout">Logout</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+    <header></header>
 
     <main>
         <app-router>

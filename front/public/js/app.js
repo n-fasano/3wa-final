@@ -1,18 +1,27 @@
 $_ = document.querySelectorAll;
 
-async function app() {
-    if (false === User.logged) {
-        User.logged = await User.isLogged();
+var header = null;
 
-        if (true === User.logged) {
-            history.replaceState({
-                path: window.location.pathname
-            }, document.title, '/');
-        }
-    } else {
-        Router.initialize();
-    }
+async function app() {
+    User.logged = await User.isLogged();
     
+    header = await fetch('/tpl/header.html')
+        .then(response => response.text())
+        .then(template => {
+            const root = document.querySelector('header');
+            const state = {
+                logged: User.logged,
+                notLogged: !User.logged
+            };
+
+            return new Component({
+                template,
+                root,
+                state
+            });
+        });
+
+    Router.initialize();
 }
 
 app();

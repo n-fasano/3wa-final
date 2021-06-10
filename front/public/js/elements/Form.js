@@ -19,7 +19,7 @@ class Form extends HTMLFormElement {
                 })
                 .then(function (json) {
                     if (json.error) {
-                        console.log('err: ' + json.error);
+                        (self.onError)(json.error);
                     } else {
                         (self.onSuccess)(json);
 
@@ -30,7 +30,6 @@ class Form extends HTMLFormElement {
                 })
                 .catch(function (error) {
                     (self.onError)(error);
-                    console.log('err: ' + error);
                 });
         });
     }

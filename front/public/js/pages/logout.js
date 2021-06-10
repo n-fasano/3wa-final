@@ -3,6 +3,10 @@ async function logout() {
 
     if (success) {
         User.isLogged = false;
+        header.setState({
+            logged: User.logged,
+            notLogged: !User.logged
+        });
         
         history.replaceState({
             path: location.pathname
@@ -10,7 +14,6 @@ async function logout() {
     } else {
         location.reload();
     }
-
 }
 
 logout();
