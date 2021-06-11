@@ -18,10 +18,16 @@ class Form extends HTMLFormElement {
                     return response.json();
                 })
                 .then(function (json) {
-                    if (json.error) {
-                        (self.onError)(json.error);
+                    if (undefined !== json.error) {
+                        if (null !== self['onError']) {
+                            window[self['onError']](json.error);
+                        }
+                        window.onError(json.error);
                     } else {
-                        (self.onSuccess)(json);
+                        if (null !== self['onSuccess']) {
+                            window[self['onSuccess']](json);
+                        }
+                        window.onSuccess(json);
 
                         history.pushState({
                             path: window.location.pathname
@@ -29,7 +35,7 @@ class Form extends HTMLFormElement {
                     }
                 })
                 .catch(function (error) {
-                    (self.onError)(error);
+                    window.onError('Something went wrong.');
                 });
         });
     }
@@ -38,9 +44,8 @@ class Form extends HTMLFormElement {
         this.actionPath = this.action.replace(location.origin, '');
         this.redirect = this.getAttribute('redirect');
 
-        const defaultCallback = () => null;
-        this.onSuccess = this.getAttribute('onSuccess') ?? defaultCallback;
-        this.onError = this.getAttribute('onError') ?? defaultCallback;
+        this.onSuccess = this.getAttribute('onsuccess');
+        this.onError = this.getAttribute('onerror');
     }
 }
 

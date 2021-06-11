@@ -48,6 +48,11 @@ header nav ul li a {
   font-size: calc(1rem + 1.2vmin);
 }
 
+app-error {
+  color: firebrick;
+  font-size: 14px;
+}
+
 main {
   width: 70vw;
   margin: calc(1rem + 7vmin) auto;

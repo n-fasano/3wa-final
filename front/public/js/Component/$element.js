@@ -8,6 +8,7 @@ class $element {
         this.displayStyle = domElement.dataset.display
             ? domElement.dataset.display
             : "block";
+
         this.listeners = {};
         this.textContentTemplate = domElement.textContent;
         this.innerHTMLTemplate = domElement.innerHTML;

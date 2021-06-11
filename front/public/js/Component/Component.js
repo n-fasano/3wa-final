@@ -45,9 +45,11 @@ class Component {
                 listeners: []
             };
             
-            this.state[key].value = state[key];
+            const value = state[key];
+            this.state[key].value = value;
+            
             this.state[key].listeners.forEach(l => {
-                l.callback(key, state[key]);
+                l.callback(key, value);
             });
         }
     }

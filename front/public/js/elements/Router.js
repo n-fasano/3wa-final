@@ -59,7 +59,7 @@ class Router extends HTMLElement {
 
     static async getTemplate(component) {
         if (undefined === Router.components[component]) {
-            Router.components[component] = await fetch(`/tpl/${component}.html`)
+            Router.components[component] = await fetch(`/tpl/pages/${component}.html`)
                 .then(function (response) {
                     return response.text();
                 });

@@ -65,6 +65,11 @@ header {
     }
 }
 
+app-error {
+    color: firebrick;
+    font-size: 14px;
+}
+
 main {
     width: 70vw;
     margin: $headerSize auto;

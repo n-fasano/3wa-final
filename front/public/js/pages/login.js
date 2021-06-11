@@ -4,5 +4,4 @@ function onLoginSuccess(json) {
         logged: User.logged,
         notLogged: !User.logged
     });
-    console.log('login');
 }
