@@ -29,6 +29,7 @@ class Router extends HTMLElement {
     }
 
     static self;
+    static body;
     static routes = {};
     static components = {};
 
@@ -45,7 +46,12 @@ class Router extends HTMLElement {
         }
 
         const html = await Router.getTemplate(route.component);
-        Router.self.innerHTML = html;
+        Router.self.innerHTML = '';
+        Router.body = new Component({
+            template: html,
+            root: Router.self,
+            state: {}
+        });
 
         const scripts = Router.self.querySelectorAll('script');
         scripts.forEach(function (script) {

@@ -1,0 +1,33 @@
+<form is="app-form" action="/threads" method="POST" redirect="/threads" id="thread_new">
+    <h3>New thread</h3>
+    <p>
+        <input
+            is="app-autocomplete" 
+            id="search_user"
+            data-field="username"
+            data-source="/users"
+            data-items="users"
+            type="text" 
+            placeholder="Find a user" 
+        >
+    </p>
+    <ul is="app-results" data-autocomplete-results="search_user">
+        <li for="users" data-loop-id="search_user_results">
+            {{ username }}
+            <button data-id="{{ id }}">Add</button>
+        </li>
+    </ul>
+    <h4 if="selectedUsers">Selected:</h4>
+    <ul is="app-selected" data-autocomplete-selected="search_user">
+        <li for="selectedUsers" data-loop-id="search_user_selected">
+            {{ username }}
+            <input type="hidden" name="users[{{ index }}]" value="{{ id }}">
+            <button data-id="{{ id }}">Remove</button>
+        </li>
+    </ul>
+
+    <hr>
+    <p>
+        <button>Create</button>
+    </p>
+</form>

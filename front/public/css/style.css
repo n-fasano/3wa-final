@@ -10,6 +10,18 @@ a {
   text-decoration: none;
 }
 
+h2, h3, h4, h5, h6 {
+  font-weight: bold;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+h4 {
+  font-size: 1.7rem;
+}
+
 header {
   background: #26a65b;
   height: calc(1rem + 7vmin);
@@ -66,6 +78,9 @@ main form p {
 }
 main form ul {
   list-style-type: disc;
+}
+main form hr {
+  width: 25%;
 }
 
 /*# sourceMappingURL=style.css.map */

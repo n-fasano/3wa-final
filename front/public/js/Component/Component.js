@@ -26,16 +26,32 @@ class Component {
     }
 
     constructor({ template, root, state }) {
+        this.template = template;
         this.regex = new RegExp(`{{ *?([^{} ]*) *?}}`, "g");
         this.state = {};
         this.root = {
             element: root,
-            children: this.buildTree(Component.strToHTML(template))
+            children: this.buildTree(Component.strToHTML(this.template))
         };
 
-        this.setState(state);
-        this.template = template;
-        this.show();
+        for (const child of this.root.children) {
+            this.root.element.append(child.element);
+        }
+
+        this.initState(state);
+    }
+
+    initState(state) {
+        for (const key in this.state) {
+            const value = state[key];
+            if (value) {
+                this.state[key].value = value;
+            }
+            
+            this.state[key].listeners.forEach(l => {
+                l.callback(key, value);
+            });
+        }
     }
 
     setState(state) {
@@ -55,9 +71,7 @@ class Component {
     }
 
     show() {
-        for (const child of this.root.children) {
-            this.root.element.append(child.element);
-        }
+        this.root.element.show();
     }
 
     buildTree(childElements) {
@@ -119,7 +133,6 @@ class Component {
     }
 
     display() {
-        this.root.element.innerHTML = "";
         this.root.element.append(this.parse());
     }
 
@@ -132,7 +145,6 @@ class Component {
             const matches = element.childNodes[0].nodeValue.matchAll(
                 new RegExp(`{{ *?([a-zA-Z0-9_]+) *?}}`, "g")
             );
-
             element.setTextContentTemplate(element.innerText);
 
             for (const match of matches) {
@@ -161,10 +173,126 @@ class Component {
 
         if (element.hasAttribute("for")) {
             const name = element.getAttribute("for");
+            const parent = element.parentElement;
+            const loopId = element.dataset.loopId;
+
+            const anchor = document.createElement('div');
+            anchor.style.display = "none";
+            anchor.setAttribute('data-loop-anchor', loopId);
+            parent.insertBefore(anchor, element);
+
+            element.remove();
+
             variables[name] ??= [];
             variables[name].push({
                 element: element,
                 callback: (variable, array) => {
+                    Array.from(
+                        parent.querySelectorAll(`[data-loop-id=${loopId}]`)
+                    ).forEach(e => e.remove());
+
+                    if (!array) {
+                        return;
+                    }
+
+                    for (let i = 0; i < array.length; i++) {
+                        const item = array[i];
+                        let newElement = element.cloneNode(true);
+                        newElement.setAttribute('data-loop-id', loopId);
+                        let templateString = element.innerHTMLTemplate;
+                        for (const key in item) {
+                            templateString = templateString.replace(
+                                new RegExp(`{{ *?${key} *?}}`, "g"),
+                                item[key]
+                            );
+                        }
+                        templateString = templateString.replace(
+                            new RegExp(`{{ *?index *?}}`, "g"),
+                            i
+                        );
+                        newElement.innerHTML = templateString;
+                        parent.insertBefore(newElement, anchor);
+                    }
+                }
+            });
+        }
+
+        return variables;
+    }
+
+    findVariables(expression) {
+        const variables = [];
+
+        const forbiddenMatches = [...expression.matchAll(new RegExp('(function)|(=>)|([^= ]+? *(=) *[^= ]+?)', 'gm'))];
+        if (forbiddenMatches.length > 0) {
+            throw new Error('Forbidden operations found in expression: '+forbiddenMatches.join(', '));
+        }
+
+        const operands = expression.matchAll(new RegExp('([^ +\-*\/]+)', 'g'));
+        for (const operand of operands) {
+            const isNumber = !isNaN(operand);
+            const isString = '\'"`'.includes(operand[0]);
+
+            if (isNumber || isString) {
+                continue;
+            }
+
+            const variable = operand.split(new RegExp('[\.\[]', 'g')).shift();
+            variables.push(variable);
+        }
+
+        return variables;
+    }
+
+    findListeners(element) {
+        const listeners = {};
+
+        const textNode = element.childNodes[0];
+        if (undefined !== textNode &&
+            null !== textNode.nodeValue) 
+        {
+            const expressions = textNode.nodeValue.matchAll(new RegExp(`{{(.*)}}`, "gm"));
+            const variables = expressions.map(expression => this.findVariables(expression)).flat();
+
+            for (const varName of variables) {
+                listeners[varName] ??= [];
+                listeners[varName].push({
+                    element: element,
+                    callback: (state) => {
+                        const expressions = element.textContentTemplate.matchAll(new RegExp(`{{(.*)}}`, "gm"));
+
+                        let content = element.textContentTemplate;
+                        for (const expression of expressions) {
+                            content = content.replace(
+                                new RegExp(`{{${expression}}}`, "gm"),
+                                eval.bind(state)(expression)
+                            );
+                        }
+
+                        element.innerText = content;
+                    }
+                });
+            }
+
+            element.setTextContentTemplate(element.innerText);
+        }
+
+        if (element.hasAttribute("if")) {
+            const name = element.getAttribute("if");
+            listeners[name] ??= [];
+            listeners[name].push({
+                element: element,
+                callback: (state) => element.toggle(state[name])
+            });
+        }
+        
+        if (element.hasAttribute("for")) {
+            const name = element.getAttribute("for");
+            listeners[name] ??= [];
+            listeners[name].push({
+                element: element,
+                callback: (state) => {
+                    const array = state[name];
                     let parent = element.parentElement;
                     parent.innerHTML = "";
                     for (let i = 0; i < array.length; i++) {
@@ -184,6 +312,6 @@ class Component {
             });
         }
 
-        return variables;
+        return listeners;
     }
 }

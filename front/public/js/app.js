@@ -1,7 +1,8 @@
 $_ = document.querySelectorAll;
 
-var header = null;
-var errorPane = null;
+window.pages = {};
+window.header = null;
+window.errorPane = null;
 
 function onSuccess(json) {
     errorPane.setState({
@@ -15,7 +16,19 @@ function onError(error) {
     });
 }
 
-async function app() {
+// const state = {
+//     flashBag: new FlashBag(),
+//     user: new User()
+// }
+
+// const root = document.getElementById('root');
+// window.app = new Component({
+//     template,
+//     root,
+//     state
+// });
+
+async function init() {
     User.logged = await User.isLogged();
     
     errorPane = await fetch('/tpl/error.html')
@@ -52,4 +65,4 @@ async function app() {
     Router.initialize();
 }
 
-app();
+init();

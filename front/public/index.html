@@ -24,8 +24,11 @@
     <script src="/js/elements/Route.js"></script>
     <script src="/js/elements/Link.js"></script>
     <script src="/js/elements/Form.js"></script>
+    <script src="/js/elements/autocomplete/Autocomplete.js"></script>
+    <script src="/js/elements/autocomplete/Results.js"></script>
+    <script src="/js/elements/autocomplete/Selected.js"></script>
 </head>
-<body>
+<body id="root">
     <header></header>
 
     <main>
@@ -37,7 +40,8 @@
             <app-route path="/login"        component="login"       public  ></app-route>
             <app-route path="/logout"       component="logout"              ></app-route>
             <app-route path="/threads"      component="threads"             ></app-route>
-            <app-route path="/thread/{id}"  component="thread"              ></app-route>
+            <app-route path="/threads/new"   component="thread_new"          ></app-route>
+            <app-route path="/threads/{id}"  component="thread"              ></app-route>
 
             <app-route path="/404"          component="404"         public  ></app-route>
         </app-router>
