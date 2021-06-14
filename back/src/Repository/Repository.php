@@ -3,9 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Entity;
-use App\Entity\Metadata\ArrayProxy;
 use App\Entity\Metadata\OneToMany;
-use App\Entity\Metadata\Proxy;
 use App\Entity\Metadata\ProxyBuilder;
 use App\Entity\Metadata\ProxyCollection;
 use App\Entity\Metadata\Reader;
@@ -21,7 +19,7 @@ use ReflectionProperty;
 abstract class Repository
 {
     /** @return array<Entity> */
-    public function getAll(string $class): array
+    protected function _getAll(string $class): array
     {
         $reader = new Reader($class);
         $table = EntitySerializer::serialize($reader->shortName());
@@ -30,19 +28,18 @@ abstract class Repository
         $results = Connection::query($select);
         
         return array_map(
-            fn($row) => $this->hydrate($class, $row),
+            fn($row) => $this->_hydrate($class, $row),
             $results
         );
     }
 
-    public function get(string $class, int $id): ?Entity
+    protected function _get(string $class, int $id): ?Entity
     {
         $reader = new Reader($class);
         $table = EntitySerializer::serialize($reader->shortName());
         $select = new Select(
             $table,
             new Where(new Search(
-                $class,
                 [new Criteria(
                     'id', 
                     $id
@@ -53,17 +50,16 @@ abstract class Repository
         $results = Connection::query($select);
         $row = array_pop($results);
         
-        return null === $row ? null : $this->hydrate($class, $row);
+        return null === $row ? null : $this->_hydrate($class, $row);
     }
 
-    public function exists(string $class, int $id): bool
+    protected function _exists(string $class, int $id): bool
     {
         $reader = new Reader($class);
         $table = EntitySerializer::serialize($reader->shortName());
         $select = new Select(
             $table,
             new Where(new Search(
-                $class,
                 [new Criteria(
                     'id', 
                     $id
@@ -78,9 +74,9 @@ abstract class Repository
     }
 
     /** @return array<Entity> */
-    public function findAll(Search $search): array
+    protected function _findAll(string $class, Search $search): array
     {
-        $reader = new Reader($search->class);
+        $reader = new Reader($class);
         $table = EntitySerializer::serialize($reader->shortName());
         $select = new Select(
             $table,
@@ -90,14 +86,14 @@ abstract class Repository
         $results = Connection::query($select);
         
         return array_map(
-            fn($row) => $this->hydrate($search->class, $row),
+            fn($row) => $this->_hydrate($class, $row),
             $results
         );
     }
     
-    public function find(Search $search): ?Entity
+    protected function _find(string $class, Search $search): ?Entity
     {
-        $reader = new Reader($search->class);
+        $reader = new Reader($class);
         $table = EntitySerializer::serialize($reader->shortName());
         $select = new Select(
             $table,
@@ -107,10 +103,10 @@ abstract class Repository
         $results = Connection::query($select);
         $row = array_pop($results);
         
-        return null === $row ? null : $this->hydrate($search->class, $row);
+        return null === $row ? null : $this->_hydrate($class, $row);
     }
     
-    public function create(Entity $entity): bool
+    protected function _create(Entity $entity): bool
     {
         $class = get_class($entity);
         $reader = new Reader($class);
@@ -149,7 +145,7 @@ abstract class Repository
         return $success;
     }
     
-    public function update(Entity $entity): bool
+    protected function _update(Entity $entity): bool
     {
         $class = get_class($entity);
         $reader = new Reader($class);
@@ -179,7 +175,7 @@ abstract class Repository
         return Connection::command($sql, $sqlParameters);
     }
     
-    public function delete(Entity $entity): bool
+    protected function _delete(Entity $entity): bool
     {
         $class = get_class($entity);
         $table = EntitySerializer::serialize($class);
@@ -188,7 +184,7 @@ abstract class Repository
         return Connection::command($sql, [':id' => $entity->id]);
     }
 
-    public function hydrate(string $class, array $row)
+    protected function _hydrate(string $class, array $row)
     {
         $reader = new Reader($class);
         $entity = new $class;
@@ -202,10 +198,10 @@ abstract class Repository
             $value = $row[$sqlField];
 
             if (is_a($type, Entity::class)) {
-                $value = $this->getProxy($type, $value);
+                $value = $this->_getProxy($type, $value);
             }
             else if ('iterable' === $type) {
-                $value = $this->getProxyCollection($property, $reader->shortName(), $row['id']);
+                $value = $this->_getProxyCollection($property, $reader->shortName(), $row['id']);
             }
 
             $entity->{$field} = $value;
@@ -214,20 +210,20 @@ abstract class Repository
         return $entity;
     }
 
-    protected function getProxy(string $type, int $id)
+    protected function _getProxy(string $type, int $id)
     {
         $repository = $this;
         $proxy = ProxyBuilder::getProxy($type);
         return new $proxy(function () use ($repository, $type, $id) {
             static $instance;
             if (!isset($instance)) {
-                $instance = $repository->get($type, $id);
+                $instance = $repository->_get($type, $id);
             }
             return $instance;
         });
     }
 
-    protected function getProxyCollection(ReflectionProperty $property, string $parentClass, int $parentId)
+    protected function _getProxyCollection(ReflectionProperty $property, string $parentClass, int $parentId)
     {
         $attribute = $property->getAttributes(OneToMany::class)[0];
         $oneToMany = $attribute->newInstance();

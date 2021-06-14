@@ -29,6 +29,9 @@ class Where
                 case Criteria::TYPE_SUPERIOR:
                     $symbol = ">";
                     break;
+                case Criteria::TYPE_NOT_EQUAL:
+                    $symbol = "!=";
+                    break;
                 
                 case Criteria::TYPE_EQUAL:
                 default:

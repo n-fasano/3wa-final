@@ -6,7 +6,7 @@ use App\Entity\Entity;
 use App\Service\StringCollection;
 use ReflectionClass;
 
-class Reader extends Entity
+class Reader
 {
     private ReflectionClass $reflection;
     private StringCollection $fields;

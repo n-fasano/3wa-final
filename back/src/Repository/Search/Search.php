@@ -6,12 +6,8 @@ use App\Service\Collection;
 
 class Search extends Collection
 {
-    public string $class;
-
-    public function __construct(string $class, array $criterias)
+    public function __construct(array $criterias)
     {
-        $this->class = $class;
-
         parent::__construct($criterias);
     }
 }

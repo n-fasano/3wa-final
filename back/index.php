@@ -43,6 +43,7 @@ try {
     $response = new Response(json_encode(['error' => $exception->getMessage()]), 400);
 } catch (NotFoundHttpException|MethodNotAllowedHttpException $exception) {
     $response = new Response(null, 404);
+    die(json_encode(['error' => $exception->getMessage()]));
 } catch (Exception $exception) {
     $response = new Response(
         "Something is wrong. If this persists, please contact the site's administrator: fasano.nm@gmail.com", 
