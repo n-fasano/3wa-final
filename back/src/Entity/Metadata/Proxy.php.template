@@ -2,10 +2,13 @@
 
 namespace {CACHE_NAMESPACE}App\Entity;
 
-class {PROXY} extends {ENTITY}
+class {PROXY} extends \{ENTITY}
 {
-    public function __construct(private callable $get)
-    { }
+    private $get;
+    public function __construct(public int $id, callable $get)
+    {
+        $this->get = $get;
+    }
 
     public function __get(string $property)
     {

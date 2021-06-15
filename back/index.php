@@ -45,6 +45,7 @@ try {
     $response = new Response(null, 404);
     die(json_encode(['error' => $exception->getMessage()]));
 } catch (Exception $exception) {
+    dd($exception, $_SERVER);
     $response = new Response(
         "Something is wrong. If this persists, please contact the site's administrator: fasano.nm@gmail.com", 
         500

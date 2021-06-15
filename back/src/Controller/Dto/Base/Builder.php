@@ -3,6 +3,7 @@
 namespace App\Controller\Dto\Base;
 
 use App\Controller\Dto\DataTransferObject;
+use Exception;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,10 +16,11 @@ final class Builder
         $reflection = new ReflectionClass($dto);
         foreach ($reflection->getProperties() as $prop) {
             $name = $prop->getName();
-            $value = $request->request->get($name);
-
-            $prop->setAccessible(true);
-            $prop->setValue($dto, $value);
+            $value = $request->request->get($name) ?? $request->get($name);
+            if (null !== $value) {
+                $prop->setAccessible(true);
+                $prop->setValue($dto, $value);
+            }
         }
 
         return $dto;

@@ -19,28 +19,45 @@ class Where
             $value = $criteria->value;
             
             switch ($criteria->type) {
+                case Criteria::TYPE_IN:
+                    $this->buildIn($sqlField, $value);
+                    break;
+
                 case Criteria::TYPE_SIMILAR:
-                    $value = "%$value%";
-                    $symbol = "LIKE";
+                    $this->build($sqlField, 'LIKE', $token, "%$value%");
                     break;
                 case Criteria::TYPE_INFERIOR:
-                    $symbol = "<";
+                    $this->build($sqlField, '<', $token, $value);
                     break;
                 case Criteria::TYPE_SUPERIOR:
-                    $symbol = ">";
+                    $this->build($sqlField, '>', $token, $value);
                     break;
                 case Criteria::TYPE_NOT_EQUAL:
-                    $symbol = "!=";
+                    $this->build($sqlField, '!=', $token, $value);
                     break;
-                
                 case Criteria::TYPE_EQUAL:
                 default:
-                    $symbol = '=';
+                    $this->build($sqlField, '=', $token, $value);
                     break;
             }
-
-            $this->query .= " AND $sqlField $symbol $token";
-            $this->parameters[$token] = $value;
         }
+    }
+
+    protected function build($sqlField, $symbol, $token, $value)
+    {
+        $this->query .= " AND $sqlField $symbol $token";
+        $this->parameters[$token] = $value;
+    }
+
+    protected function buildIn($sqlField, array $value)
+    {
+        $tokens = '';
+        foreach ($value as $i => $subvalue) {
+            $tokens .= ":$sqlField$i,";
+            $this->parameters[":$sqlField$i"] = $subvalue;
+        }
+        $tokens = rtrim($tokens, ',');
+
+        $this->query .= " AND $sqlField IN ($tokens)";
     }
 }

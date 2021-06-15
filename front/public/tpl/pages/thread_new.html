@@ -7,6 +7,7 @@
             data-field="username"
             data-source="/users"
             data-items="users"
+            transform="usersTransform"
             type="text" 
             placeholder="Find a user" 
         >
@@ -18,7 +19,7 @@
         </li>
     </ul>
     <h4 if="selectedUsers">Selected:</h4>
-    <ul is="app-selected" data-autocomplete-selected="search_user">
+    <ul is="app-selected" if="selectedUsers" data-autocomplete-selected="search_user">
         <li for="selectedUsers" data-loop-id="search_user_selected">
             {{ username }}
             <input type="hidden" name="users[{{ index }}]" value="{{ id }}">
@@ -31,3 +32,4 @@
         <button>Create</button>
     </p>
 </form>
+<script src="/js/pages/thread_new.js"></script>

@@ -24,6 +24,8 @@ h4 {
     font-size: 1.7rem;
 }
 
+.m5 { margin: 20px; }
+
 header {
     background: $primary;
     height: $headerSize;
@@ -99,6 +101,18 @@ main {
         
         hr {
             width: 25%;
+        }
+    }
+}
+
+.biglist {
+    li {
+        padding: 20px;
+        font-size: 1.5rem;
+        border: 1px solid skyblue;
+
+        h6 {
+            display: inline;
         }
     }
 }

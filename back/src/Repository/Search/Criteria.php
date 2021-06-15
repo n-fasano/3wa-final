@@ -7,6 +7,7 @@ class Criteria
     const TYPE_EQUAL = '=';
     const TYPE_NOT_EQUAL = '!=';
     const TYPE_SIMILAR = '%';
+    const TYPE_IN = 'IN';
     const TYPE_INFERIOR = '<';
     const TYPE_SUPERIOR = '>';
 

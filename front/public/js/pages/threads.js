@@ -1,4 +1,4 @@
-async function threads() {
+(async function() {
     Router.body.setState({
         threads: await fetch('/api/threads')
             .then(response => response.json())
@@ -7,6 +7,4 @@ async function threads() {
                 return item;
             }))
     });
-}
-
-threads();
+})();

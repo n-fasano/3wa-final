@@ -4,8 +4,6 @@ class Results extends HTMLUListElement {
     }
 
     connectedCallback() {
-        this.style.display = 'none';
-
         const autocompleteId = this.dataset.autocompleteResults;
         this.autocomplete = document.getElementById(autocompleteId);
         this.autocomplete.setResults(this);

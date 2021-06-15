@@ -21,7 +21,7 @@ final class Validator
                 /** @var Constraint $constraint */
                 $constraint = $attribute->newInstance();
                 if (!$constraint->validate($value)) {
-                    $errors[] = $constraint->error($prop->getName());
+                    $errors[] = $constraint->error($prop->getName(), $value);
                 }
             }
         }

@@ -1,4 +1,4 @@
-async function logout() {
+(async function() {
     const success = await User.logout();
 
     if (success) {
@@ -12,6 +12,4 @@ async function logout() {
     history.replaceState({
         path: location.pathname
     }, document.title, '/');
-}
-
-logout();
+})();

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller\Dto;
+namespace App\Controller\Dto\Command;
 
+use App\Controller\Dto\DataTransferObject;
 use App\Controller\Dto\Constraint\Length;
 
 class UserCreate implements DataTransferObject

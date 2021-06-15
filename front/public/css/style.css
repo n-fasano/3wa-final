@@ -22,6 +22,10 @@ h4 {
   font-size: 1.7rem;
 }
 
+.m5 {
+  margin: 20px;
+}
+
 header {
   background: #26a65b;
   height: calc(1rem + 7vmin);
@@ -81,6 +85,15 @@ main form ul {
 }
 main form hr {
   width: 25%;
+}
+
+.biglist li {
+  padding: 20px;
+  font-size: 1.5rem;
+  border: 1px solid skyblue;
+}
+.biglist li h6 {
+  display: inline;
 }
 
 /*# sourceMappingURL=style.css.map */

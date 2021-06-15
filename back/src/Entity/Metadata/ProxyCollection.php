@@ -7,7 +7,8 @@ use App\Service\Collection;
 
 class ProxyCollection extends Collection
 {
-    public function __construct(callable $get) { 
+    public function __construct(callable $get)
+    { 
         $this->items = new ArrayPromise($get);
     }
 }

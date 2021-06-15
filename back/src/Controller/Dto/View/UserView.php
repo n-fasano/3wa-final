@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller\Dto;
+namespace App\Controller\Dto\View;
 
 use App\Entity\User;
 
-class UserView implements DataTransferObject
+class UserView
 {
     public function __construct(User $user)
     {

@@ -3,7 +3,8 @@
 namespace App\Controller;
 
 use App\Controller\Dto\Base\Validator;
-use App\Controller\Dto\UserCreate;
+use App\Controller\Dto\Command\UserCreate;
+use App\Controller\Dto\View\CredentialsView;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Password;
@@ -24,12 +25,19 @@ class AuthController
         $this->userRepository = new UserRepository;
     }
 
-    public function logged(): JsonResponse
+    public function credentials(): JsonResponse
     {
-        return new JsonResponse(
-            ['logged' => $this->session->isLogged()], 
-            Response::HTTP_OK
-        );
+        if ($this->session->isLogged()) {
+            $username = $this->session->getUser();
+            $user = $this->userRepository->findByUsername($username);
+        } else {
+            $user = new User;
+            $user->id = 0;
+            $user->username = 'Anon';
+        }
+
+        $view = new CredentialsView($user, $this->session->isLogged());
+        return new JsonResponse($view, Response::HTTP_OK);
     }
 
     public function login(Request $request): JsonResponse
@@ -66,7 +74,6 @@ class AuthController
     public function register(UserCreate $dto): JsonResponse
     {
         $errors = Validator::validate($dto);
-
         if (0 !== count($errors)) {
             throw new BadRequestException(array_shift($errors));
         }

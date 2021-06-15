@@ -7,19 +7,12 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class NotBlank implements Constraint
 {
-    public string $error;
-
-    public function __construct(string $error)
-    {
-        $this->error = $error;
-    }
-
     public function validate($value): bool
     {
         return !empty($value);
     }
 
-    public function error(string $property): string
+    public function error(string $property, $value): string
     {
         return sprintf('The %s must not be blank.', $property);
     }

@@ -9,29 +9,31 @@ class Form extends HTMLFormElement {
             }
 
             const self = this;
+            const body = new FormData(self);
+            if (body.entries().next().done) {
+                return;
+            }
 
-            fetch(`/api${this.actionPath}`, {
+            fetch(`/api${self.actionPath()}`, {
                 method: 'POST',
-                body: new FormData(this)
+                body: body
             })
                 .then(function(response) {
                     return response.json();
                 })
                 .then(function (json) {
                     if (undefined !== json.error) {
-                        if (null !== self['onError']) {
-                            window[self['onError']](json.error);
-                        }
+                        window[self['onError']](json.error);
                         window.onError(json.error);
                     } else {
-                        if (null !== self['onSuccess']) {
-                            window[self['onSuccess']](json);
-                        }
+                        window[self['onSuccess']](json, body);
                         window.onSuccess(json);
 
-                        history.pushState({
-                            path: window.location.pathname
-                        }, self.id, self.redirect);
+                        if (null !== self.redirect) {
+                            history.pushState({
+                                path: window.location.pathname
+                            }, self.id, self.redirect);
+                        }
                     }
                 })
                 .catch(function (error) {
@@ -41,11 +43,14 @@ class Form extends HTMLFormElement {
     }
 
     connectedCallback() {
-        this.actionPath = this.action.replace(location.origin, '');
         this.redirect = this.getAttribute('redirect');
 
-        this.onSuccess = this.getAttribute('onsuccess');
-        this.onError = this.getAttribute('onerror');
+        this.onSuccess = this.getAttribute('onsuccess') ?? 'nullFunc';
+        this.onError = this.getAttribute('onerror') ?? 'nullFunc';
+    }
+
+    actionPath() {
+        return this.action.replace(location.origin, '');
     }
 }
 

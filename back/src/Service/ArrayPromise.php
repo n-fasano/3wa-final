@@ -4,38 +4,37 @@ namespace App\Service;
 
 use ArrayAccess;
 
-class ArrayPromise extends Collection implements ArrayAccess
+class ArrayPromise implements ArrayAccess
 {
-    public function __construct(
-        protected callable $get
-    ) { }
+    protected $get;
+
+    public function __construct(callable $get)
+    {
+        $this->get = $get;
+    }
 
     public function offsetSet($offset, $value)
     {
         if (is_null($offset))
         {
-            $this->items[] = $value;
+            ($this->get)()[] = $value;
         } else {
-            $this->items[$offset] = $value;
+            ($this->get)()[$offset] = $value;
         }
     }
 
     public function offsetExists($offset): bool
     {
-        if (!isset($this->items)) {
-            $this->items = ($this->get)();
-        }
-
-        return isset($this->items[$offset]);
+        return isset(($this->get)()[$offset]);
     }
 
     public function offsetUnset($offset)
     {
-        unset($this->items[$offset]);
+        unset(($this->get)()[$offset]);
     }
 
     public function offsetGet($offset)
     {
-        return $this->items[$offset] ?? null;
+        return ($this->get)()[$offset] ?? null;
     }
 }

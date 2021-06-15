@@ -4,8 +4,6 @@ class Selected extends HTMLUListElement {
     }
 
     connectedCallback() {
-        this.style.display = 'none';
-
         const autocompleteId = this.dataset.autocompleteSelected;
         this.autocomplete = document.getElementById(autocompleteId);
         this.autocomplete.setSelected(this);

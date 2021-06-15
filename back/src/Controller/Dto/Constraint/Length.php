@@ -22,7 +22,7 @@ class Length implements Constraint
         return $this->lowerBoundary <= $len && $len <= $this->upperBoundary;
     }
 
-    public function error(string $property): string
+    public function error(string $property, $value): string
     {
         return sprintf('The %s must be between %u and %u characters.', 
             $property,

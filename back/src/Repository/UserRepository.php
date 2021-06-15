@@ -38,4 +38,9 @@ class UserRepository extends Repository
     {
         return $this->_get(User::class, $id);
     }
+
+    public function exists(int $id): bool
+    {
+        return $this->_exists(User::class, $id);
+    }
 }

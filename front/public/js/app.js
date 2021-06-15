@@ -4,6 +4,8 @@ window.pages = {};
 window.header = null;
 window.errorPane = null;
 
+function nullFunc() {}
+
 function onSuccess(json) {
     errorPane.setState({
         error: ''
@@ -16,20 +18,8 @@ function onError(error) {
     });
 }
 
-// const state = {
-//     flashBag: new FlashBag(),
-//     user: new User()
-// }
-
-// const root = document.getElementById('root');
-// window.app = new Component({
-//     template,
-//     root,
-//     state
-// });
-
-async function init() {
-    User.logged = await User.isLogged();
+(async function() {
+    await User.load();
     
     errorPane = await fetch('/tpl/error.html')
         .then(response => response.text())
@@ -63,6 +53,4 @@ async function init() {
         });
 
     Router.initialize();
-}
-
-init();
+})();

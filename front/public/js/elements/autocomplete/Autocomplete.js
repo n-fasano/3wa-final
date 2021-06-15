@@ -20,34 +20,42 @@ class Autocomplete extends HTMLInputElement {
     connectedCallback() {
         this.dataSource = '/api' + this.getAttribute('data-source');
         this.itemsPropName = this.getAttribute('data-items');
-        this.selectedItemsPropName = 'selected' + this.itemsPropName[0].toUpperCase() + this.itemsPropName.substr(1);
+        this.selectedItemsPropName = 'selected' + this.itemsPropName.ucFirst();
         this.cache = {};
         this.currentResults = {};
         this.selectedItems = {};
-        this.currentSearch = '';
+        this.transform = this.getAttribute('transform');
 
         const self = this;
-        this.addEventListener('keyup', debounce(async function (e) {
+        let lastSearch = self.value;
+        self.addEventListener('keyup', debounce(async function (e) {
             const search = self.value;
-            if (search.length < 4 || self.currentSearch === search) {
+            if (search.length < 4 || lastSearch === search) {
                 return;
             }
+            lastSearch = search;
 
-            if (!self.cache[search]) {
-                self.cache[search] = await fetch(self.dataSource + `?${self.dataset.field}=${search}`)
-                    .then(response => response.json());
-            }
-
-            self.currentSearch = search;
-            self.currentResults = {};
-            for (const item of self.cache[search]) {
-                self.currentResults[item.id] = item;
-            }
-
+            await self.search(search);
             self.setState();
-            self.results.show();
-            self.selected.show();
         }, 300));
+    }
+
+    async search(search) {
+        if (!this.cache[search]) {
+            let results = await fetch(this.dataSource + `?${this.dataset.field}=${search}`)
+                .then(response => response.json());
+
+            if (this.transform && window[this.transform]) {
+                results = window[this.transform](results);
+            }
+            
+            this.cache[search] = results;
+        }
+
+        this.currentResults = {};
+        for (const item of this.cache[search]) {
+            this.currentResults[item.id] = item;
+        }
     }
 
     setState() {
@@ -59,12 +67,12 @@ class Autocomplete extends HTMLInputElement {
         Router.body.setState(state);
     }
 
-    setResults(results) {
-        this.results = results;
+    setResults(resultsElement) {
+        this.results = resultsElement;
     }
 
-    setSelected(selected) {
-        this.selected = selected;
+    setSelected(selectedElement) {
+        this.selected = selectedElement;
     }
 
     addSelected(id) {

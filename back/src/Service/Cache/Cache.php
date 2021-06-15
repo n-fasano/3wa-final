@@ -2,7 +2,7 @@
 
 namespace App\Service\Cache;
 
-use Exception;
+use RuntimeException;
 
 class Cache
 {
@@ -15,15 +15,15 @@ class Cache
     {
         $directories = explode('\\', $fullName);
         $shortName = array_pop($directories);
-        $path = CACHE_DIR;
 
-        foreach ($directories as $directory) {
-            $path .= $directory;
-            if (!is_dir($path) && mkdir($path) && !is_dir($path)) {
-                throw new Exception('Unable to write to cache.');
-            }
+        # Shifting out the "Cache" part
+        array_shift($directories);
+
+        $path = CACHE_DIR . '/' . implode('/', $directories);
+        if (!is_dir($path) && mkdir($path, 0777, true) && !is_dir($path)) {
+            throw new RuntimeException('Unable to write to cache.');
         }
 
-        return (bool) file_put_contents("$shortName.php", $contents);
+        return (bool) file_put_contents("$path/$shortName.php", $contents);
     }
 }

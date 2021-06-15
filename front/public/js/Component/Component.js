@@ -54,6 +54,10 @@ class Component {
         }
     }
 
+    getState(key) {
+        return this.state[key]?.value;
+    }
+
     setState(state) {
         for (const key in state) {
             this.state[key] ??= {
@@ -139,6 +143,37 @@ class Component {
     findVariableListeners(element) {
         const variables = {};
 
+        for (const attribute of element.attributes) {
+            const attrValue = attribute.value;
+            const matches = attrValue.matchAll(
+                new RegExp(`{{ *?([a-zA-Z0-9_]+) *?}}`, "g")
+            );
+
+            const names = [];
+            for (const match of matches) {
+                const name = match[1];
+                names.push(name);
+            }
+
+            for (const name of names) {
+                variables[name] ??= [];
+                variables[name].push({
+                    element: element,
+                    callback: () => {
+                        let _attrValue = attrValue;
+                        for (const name of names) {
+                            const value = this.state[name]?.value ?? '';
+                            _attrValue = _attrValue.replace(
+                                new RegExp(`{{ *?${name} *?}}`, "g"),
+                                value
+                            );
+                        }
+                        element.setAttribute(attribute.name, _attrValue);
+                    }
+                });
+            }
+        }
+
         if (undefined !== element.childNodes[0] &&
             null !== element.childNodes[0].nodeValue) 
         {
@@ -147,16 +182,26 @@ class Component {
             );
             element.setTextContentTemplate(element.innerText);
 
+            const names = [];
             for (const match of matches) {
                 const name = match[1];
+                names.push(name);
+            }
+
+            for (const name of names) {
                 variables[name] ??= [];
                 variables[name].push({
                     element: element,
-                    callback: (variable, value) => {
-                        element.innerText = element.textContentTemplate.replace(
-                            new RegExp(`{{ *?${variable} *?}}`, "g"),
-                            value
-                        );
+                    callback: () => {
+                        let innerText = element.textContentTemplate;
+                        for (const name of names) {
+                            const value = this.state[name]?.value ?? '';
+                            innerText = innerText.replace(
+                                new RegExp(`{{ *?${name} *?}}`, "g"),
+                                value
+                            );
+                        }
+                        element.innerText = innerText;
                     }
                 });
             }

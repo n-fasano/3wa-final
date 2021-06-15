@@ -31,11 +31,21 @@ class Router extends HTMLElement {
     static self;
     static body;
     static routes = {};
+    static dynamicRoutes = {};
     static components = {};
 
     async handleNavigation(event) {
         const currentPath = window.location.pathname;
-        let route = Router.routes[currentPath];
+        let route = Router.routes[currentPath] ?? null;
+        let state = {};
+
+        if (null === route) {
+            [route, state] = Router.match(currentPath);
+        }
+
+        if (null === route) {
+            route = Router.routes['/404'];
+        }
 
         if (null !== route.redirect) {
             route = Router.routes[route.redirect];
@@ -45,18 +55,50 @@ class Router extends HTMLElement {
             route = Router.routes['/login'];
         }
 
-        const html = await Router.getTemplate(route.component);
+        const template = await Router.getTemplate(route.component);
         Router.self.innerHTML = '';
         Router.body = new Component({
-            template: html,
+            template,
             root: Router.self,
             state: {}
         });
+        Router.body.setState(state);
 
         const scripts = Router.self.querySelectorAll('script');
-        scripts.forEach(function (script) {
-            ScriptLinker.replaceScriptNode(script);
-        });
+        scripts.forEach(ScriptLinker.replaceScriptNode);
+    }
+
+    static match(path) {
+        const parts = path.split('/');
+
+        nextRoute:
+        for (const routePath in Router.dynamicRoutes) {
+
+            const routeParts = routePath.split('/');
+            if (parts.length !== routeParts.length) {
+                continue;
+            }
+
+            const parameters = {};
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                const routePart = routeParts[i];
+
+                if (routePart.includes('{')) {
+                    const variable = routePart.replace(/\{|\}/g, '');
+                    parameters[variable] = part;
+                    continue;
+                }
+
+                if (part !== routePart) {
+                    continue nextRoute;
+                }
+            }
+
+            return [Router.dynamicRoutes[routePath], parameters];
+        }
+
+        return [null, null];
     }
 
     static initialize() {

@@ -14,11 +14,12 @@
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/style.css">
 
-    <script src="/js/Component/$element.js"></script>
-    <script src="/js/Component/Component.js"></script>
-
+    <script src="/js/utility/String.js"></script>
+    <script src="/js/utility/$element.js"></script>
     <script src="/js/utility/ScriptLinker.js"></script>
     <script src="/js/utility/User.js"></script>
+
+    <script src="/js/Component/Component.js"></script>
 
     <script src="/js/elements/Router.js"></script>
     <script src="/js/elements/Route.js"></script>
@@ -40,8 +41,8 @@
             <app-route path="/login"        component="login"       public  ></app-route>
             <app-route path="/logout"       component="logout"              ></app-route>
             <app-route path="/threads"      component="threads"             ></app-route>
-            <app-route path="/threads/new"   component="thread_new"          ></app-route>
-            <app-route path="/threads/{id}"  component="thread"              ></app-route>
+            <app-route path="/threads/new"  component="thread_new"          ></app-route>
+            <app-route path="/threads/{id}" component="thread"              ></app-route>
 
             <app-route path="/404"          component="404"         public  ></app-route>
         </app-router>

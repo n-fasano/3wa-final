@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Controller\Dto\UserView;
+use App\Controller\Dto\View\UserView;
 use App\Repository\Search\Criteria;
 use App\Repository\UserRepository;
 use App\Service\Session;
