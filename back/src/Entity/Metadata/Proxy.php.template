@@ -5,6 +5,7 @@ namespace {CACHE_NAMESPACE}App\Entity;
 class {PROXY} extends \{ENTITY}
 {
     private $get;
+    
     public function __construct(public int $id, callable $get)
     {
         $this->get = $get;
@@ -12,7 +13,7 @@ class {PROXY} extends \{ENTITY}
 
     public function __get(string $property)
     {
-        ($this->get)()->{$property};
+        return ($this->get)()->{$property};
     }
 
     public function __set(string $property, mixed $value)

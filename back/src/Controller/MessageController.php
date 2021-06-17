@@ -11,6 +11,7 @@ use App\Repository\MessageRepository;
 use App\Repository\ThreadRepository;
 use App\Repository\UserRepository;
 use App\Service\Session;
+use DateTime;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,7 +49,7 @@ class MessageController
             throw new BadRequestException('This thread does not exist.');
         }
 
-        if (!in_array($currentUser, [...$thread->users])) {
+        if (!$thread->hasUser($currentUser)) {
             throw new BadRequestException('You are not allowed to view this thread.');
         }
 
@@ -81,7 +82,7 @@ class MessageController
             throw new BadRequestException('This thread does not exist.');
         }
 
-        if (!in_array($currentUser, [...$thread->users])) {
+        if (!$thread->hasUser($currentUser)) {
             throw new BadRequestException('You are not allowed to modify this thread.');
         }
 
@@ -89,6 +90,7 @@ class MessageController
         $message->user = $currentUser;
         $message->thread = $thread;
         $message->content = $dto->content();
+        $message->sentAt = $dto->sentAt();
 
         $success = $this->messageRepository->create($message);
         $code = $success ? Response::HTTP_CREATED : Response::HTTP_INTERNAL_SERVER_ERROR;

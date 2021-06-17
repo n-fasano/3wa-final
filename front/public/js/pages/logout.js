@@ -2,10 +2,10 @@
     const success = await User.logout();
 
     if (success) {
-        User.logged = false;
         header.setState({
             logged: User.logged,
-            notLogged: !User.logged
+            notLogged: !User.logged,
+            username: User.username
         });
     }
 

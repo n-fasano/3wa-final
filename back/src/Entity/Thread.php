@@ -8,8 +8,19 @@ use App\Entity\Metadata\OneToMany;
 class Thread extends Entity
 {
     #[ManyToMany(User::class)]
-    public iterable $users = [];
+    protected iterable $users = [];
 
     #[OneToMany(Message::class)]
-    public iterable $messages = [];
+    protected iterable $messages = [];
+
+    public function hasUser(User $user): bool
+    {
+        foreach ($this->users as $threadUser) {
+            if ($threadUser->id === $user->id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

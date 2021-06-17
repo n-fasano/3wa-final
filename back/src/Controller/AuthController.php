@@ -60,7 +60,8 @@ class AuthController
         $success = $this->session->login($user);
         $code = $success ? Response::HTTP_OK : Response::HTTP_INTERNAL_SERVER_ERROR;
 
-        return new JsonResponse(['id' => $user->id], $code);
+        $view = new CredentialsView($user, $this->session->isLogged());
+        return new JsonResponse($view, $code);
     }
 
     public function logout(): JsonResponse

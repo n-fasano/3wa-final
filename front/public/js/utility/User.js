@@ -14,8 +14,16 @@ class User
     }
 
     static async logout() {
-        return await fetch('/api/logout')
+        const success = await fetch('/api/logout')
             .then(() => true)
             .catch(() => false);
+
+        if (success) {
+            User.id = 0;
+            User.username = 'Anon';
+            User.logged = false;
+        }
+
+        return success;
     }
 }

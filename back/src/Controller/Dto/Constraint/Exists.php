@@ -17,7 +17,7 @@ class Exists implements Constraint
 
     public function validate($value): bool
     {
-        return $this->repository->exists((int) $value);
+        return $value && $this->repository->exists((int) $value);
     }
 
     public function error(string $property, $value): string

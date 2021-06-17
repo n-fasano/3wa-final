@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
+
 class Message extends Entity
 {
-    public User $user;
-    public Thread $thread;
-    public string $content;
+    protected User $user;
+    protected Thread $thread;
+    protected string $content;
+    protected DateTimeInterface $sentAt;
 }

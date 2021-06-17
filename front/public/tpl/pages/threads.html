@@ -1,7 +1,7 @@
 <ul class="biglist">
-    <li><a is="app-link" href="/threads/new">New thread</a></li>
+    <li><a is="app-link" title="Create a thread" href="/threads/new">New thread</a></li>
     <li for="threads" data-loop-id="threads">
-        <a href="/threads/{{ id }}">{{ title }}</a>
+        <a href="/threads/{{ id }}">#{{ id }} - {{ title }}</a>
     </li>
 </ul>
 <script src="/js/pages/threads.js"></script>

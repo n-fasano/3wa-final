@@ -60,7 +60,7 @@ class ThreadController
             throw new BadRequestException('This thread does not exist.');
         }
 
-        if (!in_array($currentUser, [...$thread->users])) {
+        if (!$thread->hasUser($currentUser)) {
             throw new BadRequestException('You are not allowed to view this thread.');
         }
 

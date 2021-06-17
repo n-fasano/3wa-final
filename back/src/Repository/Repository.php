@@ -15,6 +15,8 @@ use App\Mysql\Query\Select;
 use App\Mysql\Query\Where;
 use App\Repository\Search\Criteria;
 use App\Repository\Search\Search;
+use DateTime;
+use DateTimeInterface;
 use Exception;
 use ReflectionProperty;
 
@@ -35,24 +37,32 @@ abstract class Repository
         );
     }
 
+    protected static $_getCache = [];
+
     protected function _get(string $class, int $id): ?Entity
     {
-        $reader = new Reader($class);
-        $table = EntitySerializer::serialize($reader->shortName());
-        $select = new Select(
-            $table,
-            new Where(new Search(
-                [new Criteria(
-                    'id', 
-                    $id
-                )]
-            ))
-        );
+        $key = "$class-$id";
 
-        $results = Connection::query($select);
-        $row = array_pop($results);
-        
-        return null === $row ? null : $this->_hydrate($class, $row);
+        if (!isset($_getCache[$key])) {
+            $reader = new Reader($class);
+            $table = EntitySerializer::serialize($reader->shortName());
+            $select = new Select(
+                $table,
+                new Where(new Search(
+                    [new Criteria(
+                        'id', 
+                        $id
+                    )]
+                ))
+            );
+    
+            $results = Connection::query($select);
+            $row = array_pop($results);
+            
+            $_getCache[$key] = null === $row ? null : $this->_hydrate($class, $row);
+        }
+
+        return $_getCache[$key];
     }
 
     abstract public function exists(int $id): bool;
@@ -121,7 +131,7 @@ abstract class Repository
         $sqlFields = '';
         $sqlValues = '';
         $sqlParameters = [];
-        
+
         $fields = $reader->fields()->not('id');
         foreach ($fields as $field) {
             if (null !== $fieldValue = $entity->{$field}) {
@@ -133,6 +143,9 @@ abstract class Repository
                 if (is_a($fieldValue, Entity::class)) {
                     $sqlField = FieldSerializer::serializeId(get_class($fieldValue));
                     $fieldValue = $fieldValue->id;
+                }
+                else if (is_a($fieldValue, DateTimeInterface::class)) {
+                    $fieldValue = $fieldValue->format(Connection::DATE_FORMAT);
                 }
 
                 $sqlFields .= "$sqlField,";
@@ -152,7 +165,7 @@ abstract class Repository
         if (true === $success = Connection::command($sql, $sqlParameters)) {
             $entity->id = Connection::lastInsertId();
         }
-        
+
         return $success;
     }
     
@@ -209,10 +222,16 @@ abstract class Repository
             $value = $row[$sqlField] ?? null;
 
             if (is_subclass_of($type, Entity::class)) {
-                $value = $this->_getProxy($type, (int) $value);
+                $sqlField = FieldSerializer::serializeId($field);
+                if (null !== $value = $row[$sqlField]) {
+                    $value = $this->_getProxy($type, (int) $value);
+                }
             }
             else if ('iterable' === $type) {
                 $value = $this->_getProxyCollection($property, $reader->shortName(), $row['id']);
+            }
+            else if ($type === DateTimeInterface::class) {
+                $value = DateTime::createFromFormat(Connection::DATE_FORMAT, $value) ?: null;
             }
 
             $entity->{$field} = $value;
@@ -224,14 +243,17 @@ abstract class Repository
     protected function _getProxy(string $type, int $id)
     {
         $repository = $this;
-        $proxy = ProxyBuilder::getProxy($type);
-        return new $proxy($id, function () use ($repository, $type, $id) {
+        $getter = function () use ($repository, $type, $id) {
             static $instance;
             if (!isset($instance)) {
                 $instance = $repository->_get($type, $id);
             }
             return $instance;
-        });
+        };
+
+        // $proxy = ProxyBuilder::getProxy($type);
+        // return new $proxy($id, $getter);
+        return (new $type)->_toProxy($id, $getter);
     }
 
     protected function _getProxyCollection(ReflectionProperty $property, string $parentClass, int $parentId)

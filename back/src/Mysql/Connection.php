@@ -7,6 +7,8 @@ use PDO;
 
 class Connection
 {
+    public const DATE_FORMAT = 'Y-m-d H:i:s';
+
     private static PDO $instance;
 
     private static function getInstance()

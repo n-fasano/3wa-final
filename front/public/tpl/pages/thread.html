@@ -1,18 +1,25 @@
-<h4>#{{ id }} {{ title }}</h4>
+<h4>#{{ id }} - {{ title }}</h4>
 <ul class="biglist">
     <li for="messages" data-loop-id="messages">
-        <h6>{{ userName }}</h6> said:
+        <h6>[{{ sentAt }}] {{ userName }}</h6> said:
         <p>{{ content }}</p>
     </li>
 </ul>
 
 <hr class="m5">
 
-<form is="app-form" action="/threads/{{ id }}/messages" method="POST" onSuccess="onMessageCreated" id="message_new">
+<form 
+    is="app-form" 
+    action="/threads/{{ id }}/messages" 
+    method="POST" 
+    onSuccess="onMessageCreated" 
+    onBeforeSubmit="onBeforeNewMessage" 
+    id="message_new"
+>
     <h3>New message</h3>
     <input type="hidden" name="thread" value="{{ id }}">
     <p>
-        <textarea name="content" cols="30" rows="10"></textarea>
+        <textarea name="content" cols="30" rows="5" minlength="1" maxlength="200"></textarea>
     </p>
     <p>
         <button>Send</button>

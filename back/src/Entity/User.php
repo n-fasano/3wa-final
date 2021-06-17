@@ -4,6 +4,6 @@ namespace App\Entity;
 
 class User extends Entity
 {
-    public string $username;
-    public string $password;
+    protected string $username;
+    protected string $password;
 }

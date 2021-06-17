@@ -14,6 +14,8 @@ class Form extends HTMLFormElement {
                 return;
             }
 
+            window[self['onBeforeSubmit']](body);
+
             fetch(`/api${self.actionPath()}`, {
                 method: 'POST',
                 body: body
@@ -45,6 +47,7 @@ class Form extends HTMLFormElement {
     connectedCallback() {
         this.redirect = this.getAttribute('redirect');
 
+        this.onBeforeSubmit = this.getAttribute('onbeforesubmit') ?? 'nullFunc';
         this.onSuccess = this.getAttribute('onsuccess') ?? 'nullFunc';
         this.onError = this.getAttribute('onerror') ?? 'nullFunc';
     }

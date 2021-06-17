@@ -4,8 +4,8 @@ namespace App\Entity;
 
 class Notification extends Entity
 {
-    public User $user;
-    public Thread $thread;
-    public int $count;
-    public Message $lastMessageRead;
+    protected User $user;
+    protected Thread $thread;
+    protected int $count;
+    protected Message $lastMessageRead;
 }

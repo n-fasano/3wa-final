@@ -42,7 +42,8 @@ function onError(error) {
             const root = document.querySelector('header');
             const state = {
                 logged: User.logged,
-                notLogged: !User.logged
+                notLogged: !User.logged,
+                username: User.username
             };
 
             return new Component({

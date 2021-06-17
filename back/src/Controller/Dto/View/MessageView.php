@@ -12,6 +12,7 @@ class MessageView
         $this->userId = $message->user->id;
         $this->userName = $message->user->username;
         $this->content = $message->content;
+        $this->sentAt = $message->sentAt->format('d-m-Y H:i:s');
     }
 
     public int $id;
